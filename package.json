@@ -1,0 +1,24 @@
+{
+  "name": "npc-onboarding-be",
+  "version": "1.0.0",
+  "description": "**Project Name:** Netrust Philippines Corporation Onboarding App \r **Version:** 1.0  \r **Date:** 8/24/26 \r **Authors:** Richard Regala",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rigsue/npc-onboarding-be.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/rigsue/npc-onboarding-be/issues"
+  },
+  "homepage": "https://github.com/rigsue/npc-onboarding-be#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
