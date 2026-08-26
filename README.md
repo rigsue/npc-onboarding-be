@@ -9,25 +9,23 @@
 
 ## Table of Contents
 
-1. [Title Section](#technical-specification-document-tsd)
-2. [Introduction](#1-introduction)
-3. [Project Scope](#2-project-scope)
-4. [Features](#3-features)
-    - [Functional Requirements](#3.1-functional-requirements)
-    - [Non-Functional Requirements](#3.2-non-functional-requirements)
-5. [System Architecture](#4-system-architecture)
-6. [Frontend Requirements](#5-frontend-requirements)
-7. [Backend Requirements](#6-backend-requirements)
-8. [Database Design (ERD)](#7-database-design-erd)
-9. [UI/UX Design (Figma Mockups + Typography)](#8-uiux-design-figma-mockups)
-10. [Project Management (Trello)](#9-project-management-trello)
-11. [Development Roadmap](#10-development-roadmap)
-12. [Deliverables](#11-deliverables)
-13. [References / Links](#12-references--links)
+1. Technical Specification Document (TSD)
+2. #1-Introduction
+3. #2-Project Scope
+4. #3-Features
+    - #3.1-Functional Requirements
+    - #3.2-Non-functional Requirements
+5. #4-System Architecture
+6. #5-Frontend Requirements
+7. #6-Backend Requirements
+8. #7-Database Design - ERD
+9. #8-UI UX Design | Figma | Mockups | Typography
+10. #9-Project Management Trello | MS Planner)
+11. #10-Development Roadmap
+12. #11-Deliverables
+13. #12-References | Links
 
 ------------------------------------------------------------------------
-
-## 1. Introduction
 
 ## 1. Introduction
 
