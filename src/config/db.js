@@ -1,7 +1,5 @@
-import pg1 from "pg";
-
 import dotenv from "dotenv";
-
+import pg1 from "pg";
 dotenv.config();
 
 const { Pool } = pg1;
@@ -14,7 +12,7 @@ const pool = new Pool({
     database: process.env.DB_NAME,
 
     max: 10,
-    idleTimoutMills: 3000,
+    idleTimeoutMillis: 3000,
     connectionTimeoutMillis: 2000
 });
 

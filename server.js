@@ -1,7 +1,7 @@
-import express from 'express';
-import pool from "./db.js";
+import app from "./app.js";
+import pool from "./src/config/db.js";
 
-const app = express();
+// const app = express();
 
 const PORT = process.env.PORT || 3001
 
