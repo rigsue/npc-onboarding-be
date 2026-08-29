@@ -5,9 +5,12 @@ import pool from "./src/config/db.js";
 
 const PORT = process.env.PORT || 3001
 
+// let testConnect;
 async function startServer() {
     try {
-        await pool.query("SELECT NOW()");
+        await pool.query("SELECT NOW()",
+            console.log("Connected to my PostgreSql")
+        );
 
         app.listen(PORT, () => {
             console.log(`API is now online on port ${PORT}`);

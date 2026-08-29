@@ -39,12 +39,14 @@ The application will support three primary user roles: **Local User, Admin User,
 and Super Admin User**, with each role having specific permissions and responsibilities.
 
 * **Local Users** will use the platform to access assigned onboarding modules, 
-complete lectures and examinations, monitor their onboarding progress, 
-receive notifications, and view relevant HR or administrative announcements.
+complete lectures and examinations, monitor their onboarding progress, receive certificates
+once specific module is completed, receive notifications, and view relevant HR 
+or administrative announcements.
 
 * **Admin Users** will have access to module management functions within their 
 assigned scope. They will be able to create, edit, and maintain lecture materials 
 and examinations, as well as monitor the progress and assessment results of Local Users.
+They will also receive notifications, and view relevant HR or admin announcements.
 
 * **Super Admin Users** will have the highest level of system access. 
 They will be responsible for creating, managing, and deleting Local 
@@ -107,6 +109,8 @@ for each assigned onboarding module.
 or assigned modules.
 * **Examination Results:** Allow users to view their examination results 
 and completion status where permitted.
+* **Certification:** Allow users to receive, view, and donwload their Certificates
+once the module is completed.
 * **Notifications and Announcements:** Allow users to receive system notifications, 
 HR announcements, and administrative updates.
 * **Onboarding Status:** Provide users with an overview of their overall onboarding 
@@ -128,6 +132,8 @@ choices, and correct answers.
 * **User Progress Monitoring:** Allow Admin Users to monitor the onboarding and examination 
 progress of Local Users.
 * **Examination Results:** Allow Admin Users to review examination results and completion status.
+* **Certificates:** Allow Admin Users to create and edit their certificates once their assigned
+module is completed.
 * **Notifications and Announcements:** Allow Admin Users to provide relevant notifications 
 or updates to Local Users within their authorized scope.
 * **Profile Management:** Allow Admin Users to manage their own profile information.
@@ -253,6 +259,7 @@ The Local User interface shall include:
 * Module progress indicator
 * Examination page
 * Examination results
+* Certifications
 * Notifications and announcements
 * Onboarding completion status
 * Logout functionality
@@ -270,6 +277,7 @@ The Admin interface shall include:
 * Question management
 * Local User progress monitoring
 * Examination results
+* Certification management
 * Notifications and announcements
 * Admin profile
 * Logout functionality
@@ -355,6 +363,7 @@ The backend shall provide APIs for:
 * Examination submission
 * Examination results
 * Progress tracking
+* Certification management
 * Notifications and announcements
 * Dashboard statistics
 
@@ -423,7 +432,18 @@ The backend shall record and retrieve:
 * Examination scores.
 * Overall onboarding progress.
 
-### 6.8 Notification Management
+### 6.8 Certificate Management
+
+The backend shall support:
+
+* Creating certificates.
+* Updating certificates.
+* Activating or deactivating certification.
+* Deleting certifates where permitted.
+* Assigning certificates to Local Users.
+* Tracking certifications.
+
+### 6.9 Notification Management
 
 The backend shall support notifications and announcements for:
 
@@ -435,7 +455,7 @@ The backend shall support notifications and announcements for:
 
 Notifications shall be associated with the intended recipient or user group.
 
-### 6.9 Error Handling
+### 6.10 Error Handling
 
 The backend shall provide standardized API responses for:
 
@@ -450,7 +470,7 @@ The backend shall provide standardized API responses for:
 Sensitive technical information such as database credentials, server paths, 
 or internal stack traces shall not be exposed to frontend users.
 
-### 6.10 Logging and Audit Trail
+### 6.11 Logging and Audit Trail
 
 The backend should maintain logs for important system activities, including:
 
@@ -477,10 +497,11 @@ user progress, results, and notifications.
 The database shall:
 
 * Maintain accurate and consistent application data.
-* Support relationships between users, modules, lectures, and examinations.
+* Support relationships between users, modules, lectures, examinations and certifications.
 * Support user progress tracking.
 * Store examination attempts and results.
 * Support role-based access control.
+* Store and maintain certificate records.
 * Maintain notification records.
 * Support future expansion of the onboarding platform.
 
@@ -500,6 +521,7 @@ The database shall:
 | Choices            | Stores possible answers for questions                |
 | Exam_Attempts      | Records examination attempts                         |
 | Exam_Answers       | Stores answers submitted by users                    |
+| Certificates       | Stores certificates that can be downloaded by users  |
 | Notifications      | Stores system notifications and announcements        |
 | Audit_Logs         | Records important administrative activities          |
 
@@ -517,6 +539,7 @@ The proposed database relationships include:
 * One **Question** can contain multiple **Choices**.
 * One **User** can have multiple **Exam Attempts**.
 * One **Exam Attempt** can contain multiple **Exam Answers**.
+* One **User** can receive multiple **Certifications**.
 * One **User** can receive multiple **Notifications**.
 * Administrative actions can generate multiple **Audit Log** records.
 
