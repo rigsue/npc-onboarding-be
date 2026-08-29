@@ -336,17 +336,19 @@ database communication, and security controls required by the application.
 
 ### 6.1 Backend Technology Stack
 
-| Component         | Technology                               |
-| ----------------- | ---------------------------------------- |
-| Runtime           | Node.js                                  |
-| Framework         | Express.js                               |
-| API Architecture  | REST API                                 |
-| Database          | PostgreSQL                               |
-| Authentication    | JWT / Secure Session                     |
-| Password Security | bcrypt or equivalent hashing mechanism   |
-| Database Access   | PostgreSQL driver / ORM where applicable |
-| API Testing       | Postman                                  |
-| Version Control   | Git / GitHub                             |
+| Component             | Technology                               |
+| --------------------- | ---------------------------------------- |
+| Runtime               | Node.js                                  |
+| Framework             | Express.js                               |
+| API Architecture      | REST API                                 |
+| Database              | PostgreSQL                               |
+| Database Migration    | Knexfile.js                              |
+| Relationship Diagram  | Draw.io from app.diagrams.net            |
+| Authentication        | JWT / Secure Session                     |
+| Password Security     | bcrypt or equivalent hashing mechanism   |
+| Database Access       | PostgreSQL driver / ORM where applicable |
+| API Testing           | Postman                                  |
+| Version Control       | Git / GitHub                             |
 
 ### 6.2 API Requirements
 
