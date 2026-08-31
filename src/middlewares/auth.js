@@ -16,7 +16,7 @@ export async function createAccessToken(user) {
     });
 }
 //  -   -   verify token    -   -
-    export async function verify(req, res, next) {
+    export async function verifyToken(req, res, next) {
         const authHeader = req.headers.authorization;
 
 //  -   -   if no Auth Header   -   -   
