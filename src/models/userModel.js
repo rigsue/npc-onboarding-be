@@ -149,7 +149,7 @@ export async function updateUserPassword(
     const sql = `
     UPDATE users 
     SET
-        password_has = $1,
+        password_hash = $1,
         updated_at = CURRENT_TIMESTAMP
     WHERE user_id = $2
     RETURNING
@@ -170,7 +170,7 @@ export async function updateUserPassword(
     return rows [0];
 }
 
-export async function deactivateUseryId(
+export async function deactivateUserById(
         user_id, 
         updated_by, 
         connection = pool
@@ -192,7 +192,7 @@ export async function deactivateUseryId(
         updated_by;
     `;
 
-    const values = [updatedBy, user_id];
+    const values = [updated_by, user_id];
 
     const { rows } = await connection.query(sql, values);
 
