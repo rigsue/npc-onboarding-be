@@ -1,5 +1,4 @@
-import bcrypt from "bycrptjs";
-import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 // import user from "../models/userModels";
 import { 
     createUser,
@@ -9,7 +8,7 @@ import {
     updateUserById,
     updateUserPassword,
     deactivateUserById
- } from "../models/userModels.js";
+ } from "../models/userModel.js";
 
 export async function createUserControl(req, res, next) {
     try {

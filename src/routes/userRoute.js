@@ -9,15 +9,18 @@ import {
     deactivateUser
 } from "../controllers/userController.js";
 
-import { verifySuperAdmin, verifyAdmin, verifyToken } from "../middlewares/auth.js";
+import { 
+    verifySuperAdmin, 
+    verifyToken 
+} from "../middlewares/auth.js";
 
 const router = Router();
 
-router.post("/create_user", verifyToken, verifySuperAdmin, createUserControl);
-router.get("/get_user", verifyToken, getUsers);
-router.get("/get_user_byid", verifyToken, getUserById);
-router.put("/update_user", verifyToken, updateUser)
-router.patch("/:id/password", verifyToken, updatePassword);
-router.patcu("/:id/deactivate", verifyToken, deactivateUser);
+router.post("/create-user", verifyToken, verifySuperAdmin, createUserControl);
+router.get("/get-users", verifyToken, verifySuperAdmin, getUsers);
+router.get("/:id/get-user", verifyToken, verifySuperAdmin, getUserById);
+router.put("/:id/update-user", verifyToken, verifySuperAdmin, updateUser)
+router.patch("/:id/password", verifyToken, verifySuperAdmin, updatePassword);
+router.patch("/:id/deactivate", verifyToken, verifySuperAdmin, deactivateUser);
 
 export default router;
