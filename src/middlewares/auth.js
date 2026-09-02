@@ -10,6 +10,7 @@ export async function createAccessToken(user) {
     const data = {
         user_id: user.user_id,
         email: user.email,
+        role: user.role_name
     };
     return jwt.sign(data, JWT_SECRET_KEY, {
         expiresIn: "1h"
@@ -50,7 +51,7 @@ export async function createAccessToken(user) {
             );
 
 //  -   -   Attache decoded user info to req object -   -
-            req.users = decodedToken;
+            req.user = decodedToken;
 
             next();
         } catch (err) {
@@ -63,14 +64,14 @@ export async function createAccessToken(user) {
 
 //  -   -   verify admin    -   -
     export async function verifyAdmin(req, res, next) {
-        if(!req.users) {
+        if(!req.user) {
             return res.status(401).json({
                 auth: "Failed",
                 message: "Authentication required"
             });
         } 
         
-        if (req.users.isAdmin) {
+        if (req.user.role === verifyAdmin) {
             next();
         }else {
             return res.status(403).send({
@@ -81,14 +82,14 @@ export async function createAccessToken(user) {
     }
 //  -   -   verify super admin    -   -
     export async function verifySuperAdmin(req, res, next) {
-        if(!req.users) {
+        if(!req.user) {
             return res.status(401).json({
                 auth: "Failed",
                 message: "Authentication required"
             })
         }
         
-        if (req.users.isSuperAdmin) {
+        if (req.user.role === "super_admin") {
             next();
             
         } else {
