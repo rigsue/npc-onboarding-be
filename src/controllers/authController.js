@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { pool } from "../config/db.js";
+import pool from "../config/db.js";
 import { createAccessToken } from "../middlewares/auth.js";
 
 export async function login(req, res, next) {

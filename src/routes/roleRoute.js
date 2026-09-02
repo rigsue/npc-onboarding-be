@@ -13,7 +13,7 @@ import {
 
 const router = Router();
 
-router.get("/", verifyToken, verifyAdmin, verifySuperAdmin, getRoles);
-router.get("/", verifyToken, verifyAdmin, verifySuperAdmin, getRoleById);
+router.get("/get-role", verifyToken, verifyAdmin, verifySuperAdmin, getRoles);
+router.get("/:id/roles", verifyToken, verifyAdmin, verifySuperAdmin, getRoleById);
 
 export default router;

@@ -5,7 +5,7 @@ import authRoutes from "./src/routes/authRoute.js";
 import userRoutes from "./src/routes/userRoute.js";
 import roleRoutes from "./src/routes/roleRoute.js";
 
-import errorHandler from "./src/middlewares/errorHandler.js";
+import { errorHandler } from "./src/middlewares/errorHandler.js";
 
 const app = exprs();
 const corsOPtions = {
