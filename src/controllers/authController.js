@@ -1,3 +1,4 @@
+// import {jwt} from "jsonwebtoken"
 import bcrypt from "bcrypt";
 import pool from "../config/db.js";
 import { createAccessToken } from "../middlewares/auth.js";
@@ -22,14 +23,20 @@ export async function login(req, res, next) {
         const result = await pool.query(
             `
             SELECT
-                user_id,
-                first_name,
-                last_name,
-                email,
-                password_hash,
-                is_active
-            FROM users
-            WHERE email = $1
+                u.user_id,
+                u.first_name,
+                u.last_name,
+                u.email,
+                u.password_hash,
+                u.is_active,
+                r.role_id,
+                r.role_name
+            FROM users u
+            INNER JOIN user_roles ur
+                ON u.user_id = ur.user_id
+            INNER JOIN roles r
+                ON ur.role_id = r.role_id
+            WHERE u.email = $1
             `,
             [email]
         );
@@ -37,15 +44,20 @@ export async function login(req, res, next) {
         //  -   -   check user if exist   -   -
         if (result.rows.length === 0) {
             const error = new Error(
-                "Invalide email or password"
+                "Invalides email or password"
             );
-            error.status = 401;
+            error.status = 402;
             error.code = "invalid_credentials";
 
             throw error;
         }
 
         const user = result.rows[0];
+
+        // check if superAdmin is unable to create User
+/*         console.log("LOGIN USER:");
+        console.log(user);
+        console.log("ROLE:", user.role_name); */
 
     //  -   -   Check user if active    -   -
         if (!user.is_active) {
@@ -65,7 +77,7 @@ export async function login(req, res, next) {
 
             if (!passwordMatch) {
                 const error = new Error(
-                    "Invalide email or password"
+                    "Invalidey email or password"
                 )
                 error.status = 401;
                 error.code = "invalid_credentials";
@@ -74,7 +86,7 @@ export async function login(req, res, next) {
             }    
 
 //  -   -   Create JWT  -   -   
-            const  token = createAccessToken(user);
+            const  token = await createAccessToken(user);
 
 //  -   -   if ok   -   -
             return res.status(200).json({
@@ -86,10 +98,16 @@ export async function login(req, res, next) {
                     last_name: user.last_name,
                     email: user.email
                 },
-                token
+                token: token
             });
 
         } catch (err) {
             next(err);
     }
+}
+
+export async function logout(req, res) {
+    return res.status(200).json({
+        message: "Logout successful"
+    });
 }

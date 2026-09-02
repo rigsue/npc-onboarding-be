@@ -40,14 +40,20 @@ export async function createUser(user, connection = pool) {
 export async function findUserByEmail(email, connection = pool) {
     const sql = `
     SELECT
-        user_id,
-        first_name,
-        last_name,
-        email,
-        password_hash,
-        is_active
-    FROM users
-    WHERE email = $1;
+        u.user_id,
+        u.first_name,
+        u.last_name,
+        u.email,
+        u.password_hash,
+        u.is_active,
+        r.role_id,
+        r.role_name
+    FROM users u
+    INNER JOIN user_roles ur
+        ON u.user_id = ur.user_id
+    INNER JOIN roles r
+        ON ur.role_id = r.role_id
+    WHERE u.email = $1;
     `;
 
     const values = [email];
