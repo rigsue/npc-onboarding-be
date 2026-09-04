@@ -24,7 +24,7 @@ export async function createUserControl(req, res, next) {
         } = req.body;
 
 //  -   -   Basic validation    -   -
-        if (!firstName || !lastName || !email || !password || roleId) {
+        if (!firstName || !lastName || !email || !password || !roleId) {
             return res.status(400).json({
                 message: "Name, email and password are required."
             });
@@ -118,7 +118,7 @@ export async function updateUser(req, res, next) {
 
         if (!firstName || !lastName || !email || !password) {
             return res.status(400).json({
-                message: "Name, email and password are required."
+                message: "Name, email and password are requireder."
             });
         }
 

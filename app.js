@@ -12,6 +12,7 @@ const corsOPtions = {
     origin: [
         'http://localhost:3002',
         'http://localhost:4002',
+        'http://localhost:5173',
     ],
     credentials: true,
     optionsSuccessStatus: 200
