@@ -74,8 +74,9 @@ export async function findAllUsers(connection = pool) {
         created_at,
         updated_at,
         created_by,
-        updated_by;
-    FROM users ORDER BY user_id;
+        updated_by
+    FROM users 
+    ORDER BY user_id;
     `;
 
     const { rows } = await connection.query(sql);
@@ -94,7 +95,7 @@ export async function findUserById(user_id, connection = pool) {
         created_at,
         updated_at,
         created_by,
-        updated_by;
+        updated_by
     FROM users
     WHERE user_id = $1;
     `;
@@ -194,7 +195,7 @@ export async function deactivateUserById(
         last_name,
         email,
         is_active,
-        update_at,
+        updated_at,
         updated_by;
     `;
 

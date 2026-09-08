@@ -74,12 +74,16 @@ export async function createUserControl(req, res, next) {
 
 export async function getUsers(req, res, next) {
     try {
+        // console.log("GET USERS: controller reached");
         const users = await findAllUsers();
+/*         console.log("get users: db query is done")
+        console.log("Get users = ", users) */
 
         return res.status(200).json({
             data: users
         });
     } catch (error) {{
+        // console.log("Get users error = ", error);
         next(error);
     }}
     
@@ -88,6 +92,7 @@ export async function getUsers(req, res, next) {
 export async function getUserById(req, res, next) {
     try {
         const { id } = req.params;
+
 
         const user = await findUserById(id);
 
@@ -116,7 +121,7 @@ export async function updateUser(req, res, next) {
             isActive,
         } = req.body;
 
-        if (!firstName || !lastName || !email || !password) {
+        if (!firstName || !lastName || !email) {
             return res.status(400).json({
                 message: "Name, email and password are requireder."
             });
@@ -165,7 +170,7 @@ export async function updatePassword(req, res, next) {
             id, passwordHash
         );
 
-        if (!updateUser) {
+        if (!updatedUser) {
             return res.status(404).json({
                 error: "User not found"
             });
@@ -183,7 +188,10 @@ export async function deactivateUser(req, res, next) {
     try {
         const { id } = req.params;
 
-        const deactivatedUser = await deactivateUserById(id);
+        const deactivatedUser = await deactivateUserById(
+            id,
+        req.user.user_id
+    );
 
         if (!deactivatedUser) {
             return res.status(404).json({

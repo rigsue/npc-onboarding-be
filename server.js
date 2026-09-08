@@ -12,7 +12,7 @@ async function startServer() {
             console.log("Connected to my PostgreSql")
         );
 
-        app.listen(PORT, () => {
+        app.listen(PORT, "0.0.0.0", () => {
             console.log(`API is now online on port ${PORT}`);
         });
     } catch (err) {
