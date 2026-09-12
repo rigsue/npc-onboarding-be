@@ -8,16 +8,20 @@ export async function createUser(user, connection = pool) {
         email,
         password_hash,
         is_active,
+        department_id,
+        contact_number,
         created_by,
         updated_by
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING
         user_id,
         first_name,
         last_name,
         email,
         is_active,
+        department_id,
+        contact_number,
         created_at,
         updated_at,
         created_by,
@@ -29,6 +33,8 @@ export async function createUser(user, connection = pool) {
         user.email,
         user.passwordHash,
         user.isActive,
+        user.departmentId,
+        user.contactNumber,
         user.createdBy,
         user.updatedBy
     ];
@@ -46,13 +52,17 @@ export async function findUserByEmail(email, connection = pool) {
         u.email,
         u.password_hash,
         u.is_active,
+        u.contact_number,
         r.role_id,
-        r.role_name
+        r.role_name,
+        d.department_name
     FROM users u
     INNER JOIN user_roles ur
         ON u.user_id = ur.user_id
     INNER JOIN roles r
         ON ur.role_id = r.role_id
+    LEFT JOIN departments d
+        ON u.department_id = d.department_id
     WHERE u.email = $1;
     `;
 
@@ -66,17 +76,22 @@ export async function findUserByEmail(email, connection = pool) {
 export async function findAllUsers(connection = pool) {
     const sql = `
     SELECT 
-        user_id,
-        first_name,
-        last_name,
-        email,
-        is_active,
-        created_at,
-        updated_at,
-        created_by,
-        updated_by
-    FROM users 
-    ORDER BY user_id;
+        u.user_id,
+        u.first_name,
+        u.last_name,
+        u.email,
+        u.is_active,
+        d.department_id,
+        d.department_name,
+        u.contact_number,
+        u.created_at,
+        u.updated_at,
+        u.created_by,
+        u.updated_by
+    FROM users u
+    LEFT JOIN departments d
+        ON u.department_id = d.department_id
+    ORDER BY u.user_id;
     `;
 
     const { rows } = await connection.query(sql);
@@ -87,17 +102,22 @@ export async function findAllUsers(connection = pool) {
 export async function findUserById(user_id, connection = pool) {
     const sql = `
     SELECT
-        user_id,
-        first_name,
-        last_name,
-        email,
-        is_active,
-        created_at,
-        updated_at,
-        created_by,
-        updated_by
-    FROM users
-    WHERE user_id = $1;
+        u.user_id,
+        u.first_name,
+        u.last_name,
+        u.email,
+        u.is_active,
+        d.department_id,
+        d.department_name,
+        u.contact_number,
+        u.created_at,
+        u.updated_at,
+        u.created_by,
+        u.updated_by
+    FROM users u
+    LEFT JOIN departments d
+        ON u.department_id = d.department_id
+    WHERE u.user_id = $1;
     `;
 
     const values = [user_id];
@@ -119,15 +139,17 @@ export async function updateUserById(
         last_name = $2,
         email = $3,
         is_active = $4,
-        updated_by = $5,
+        department_name = $5,
+        updated_by = $6,
         updated_at = CURRENT_TIMESTAMP
-    WHERE user_id = $6
+    WHERE user_id = $7
     RETURNING
         user_id,
         first_name,
         last_name,
         email,
         is_active,
+        department_name,
         created_at,
         updated_at,
         created_by,
@@ -139,6 +161,7 @@ export async function updateUserById(
         user.lastName,
         user.email,
         user.isActive,
+        user.departmentName,
         user.updatedBy,
         user_id
     ]

@@ -4,6 +4,7 @@ import cors from 'cors';
 import authRoutes from "./src/routes/authRoute.js";
 import userRoutes from "./src/routes/userRoute.js";
 import roleRoutes from "./src/routes/roleRoute.js";
+import departmentRoutes from "./src/routes/departmentRoute.js";
 
 import { errorHandler } from "./src/middlewares/errorHandler.js";
 
@@ -28,6 +29,7 @@ app.use(exprs.urlencoded({ extended: true }));
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/role", roleRoutes);
+app.use("/department", departmentRoutes);
 
 app.use(errorHandler);
 

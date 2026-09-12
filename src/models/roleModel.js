@@ -21,8 +21,9 @@ export async function findAllRoles(connection = pool) {
     const sql = `
     SELECT
         role_id,
-        role_name;
-    FROM roles ORDER BY role_id;
+        role_name
+    FROM roles 
+    ORDER BY role_id;
     `;
 
     const { rows } = await connection.query(sql);

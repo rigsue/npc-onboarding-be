@@ -10,7 +10,9 @@ export async function createAccessToken(user) {
     const data = {
         user_id: user.user_id,
         email: user.email,
-        role: user.role_name
+        role: user.role_name,
+        department: user.department_id,
+        contact: user.contact_number
     };
     return jwt.sign(data, JWT_SECRET_KEY, {
         expiresIn: "1h"
@@ -71,12 +73,12 @@ export async function createAccessToken(user) {
             });
         } 
         
-        if (req.user.role === verifyAdmin) {
+        if (req.user.role === "admin") {
             next();
         }else {
             return res.status(403).send({
                 auth: "Failed",
-                message: "Action Forbidden. Not an Admin Account"
+                message: "Action Forbidden. Not an AdminSuper Account"
             });
         }
     }
@@ -98,4 +100,23 @@ export async function createAccessToken(user) {
                 message: "Action Forbidden. Not a Super Admin Account"
             });
         }
+    }
+
+    export async function verifyAdminOrSuperadmin(req, res, next) {
+        if(!req.user) {
+            return res.status(401).json({
+                auth: "Failed",
+                message: "Authentication required"
+            });
+        }
+        if(
+            req.user.role === "admin" ||
+            req.user.role === "super_admin"
+        ) {
+            return next();
+        }
+        return res.status(403).json({
+            auth: "Failed",
+            message: "Action Forbid not admin or superad"
+        });
     }

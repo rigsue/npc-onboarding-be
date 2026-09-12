@@ -1,8 +1,7 @@
-/*
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
+
 export async function up(knex) {
+
+  // on the next table creation, include department & contact_number
   await knex.schema.createTable("users", (table) => {
     table.increments("user_id").primary();
 
@@ -18,10 +17,7 @@ export async function up(knex) {
   })
 };
 
-/*
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
+
 export async function down(knex) {
   await knex.schema.dropTableIfExists("users");
 };
