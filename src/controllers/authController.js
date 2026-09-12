@@ -29,13 +29,18 @@ export async function login(req, res, next) {
                 u.email,
                 u.password_hash,
                 u.is_active,
+                u.contact_number,
                 r.role_id,
-                r.role_name
+                r.role_name,
+                d.department_name
+
             FROM users u
             INNER JOIN user_roles ur
                 ON u.user_id = ur.user_id
             INNER JOIN roles r
                 ON ur.role_id = r.role_id
+            LEFT JOIN departments d
+                ON u.department_id = d.department_id
             WHERE u.email = $1
             `,
             [email]
@@ -97,7 +102,10 @@ export async function login(req, res, next) {
                     first_name: user.first_name,
                     last_name: user.last_name,
                     email: user.email,
-                    role_name: user.role_name
+                    role_name: user.role_name,
+                    is_active: user.is_active,
+                    contact_number: user.contact_number,
+                    department_name: user.department_name,
                 },
                 token: token
             });

@@ -10,7 +10,7 @@ import {
     deactivateUserById
  } from "../models/userModel.js";
 
-import { createUserRole } from "../models/UserRoleModel.js";
+import { createUserRole } from "../models/userRoleModel.js";
 
 export async function createUserControl(req, res, next) {
     try {
@@ -20,13 +20,21 @@ export async function createUserControl(req, res, next) {
             email,
             password,
             isActive = true,
-            roleId
+            roleId,
+            departmentId,
+            contactNumber,
         } = req.body;
 
 //  -   -   Basic validation    -   -
-        if (!firstName || !lastName || !email || !password || !roleId) {
+        if (!firstName 
+            || !lastName 
+            || !email 
+            || !password 
+            || !roleId 
+            || !departmentId
+        ) {
             return res.status(400).json({
-                message: "Name, email and password are required."
+                message: "Name, email, password, roles and department are required."
             });
         }
 //  -   -   check email if exist    -   -
@@ -47,6 +55,9 @@ export async function createUserControl(req, res, next) {
             email,
             passwordHash,
             isActive,
+            departmentId,
+            roleId,
+            contactNumber,
             createdBy: req.user?.user_id || null,
             updatedBy: req.user?.user_id || null
         };
@@ -82,19 +93,19 @@ export async function getUsers(req, res, next) {
         return res.status(200).json({
             data: users
         });
-    } catch (error) {{
+    } catch (error) {
         // console.log("Get users error = ", error);
         next(error);
-    }}
+    }
     
 }
 
 export async function getUserById(req, res, next) {
     try {
-        const { id } = req.params;
+        const { user_id } = req.params;
 
 
-        const user = await findUserById(id);
+        const user = await findUserById(user_id);
 
         if(!user) {
             return res.status(404).json({
@@ -102,7 +113,7 @@ export async function getUserById(req, res, next) {
             });
         }
 
-        return res.status(201).json({
+        return res.status(200).json({
             data: user
         });
     }   catch (error) {
@@ -119,9 +130,11 @@ export async function updateUser(req, res, next) {
             lastName,
             email,
             isActive,
+            departmentName,
+            contactNumber
         } = req.body;
 
-        if (!firstName || !lastName || !email) {
+        if (!firstName || !lastName || !email || departmentName) {
             return res.status(400).json({
                 message: "Name, email and password are requireder."
             });
@@ -134,6 +147,8 @@ export async function updateUser(req, res, next) {
                 lastName,
                 email,
                 isActive,
+                departmentName,
+                contactNumber,
                 updatedBy: req.user.user_id
             }
         );
@@ -145,7 +160,7 @@ export async function updateUser(req, res, next) {
         }
         return res.status(200).json({
             message: "User has been updated successfully",
-            user: updateUser
+            user: updatedUser
         });
     } catch (error) {
         next(error);
