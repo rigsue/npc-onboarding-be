@@ -83,12 +83,18 @@ export async function findAllUsers(connection = pool) {
         u.is_active,
         d.department_id,
         d.department_name,
-        u.contact_number,
+        u.contact_number,        
+        r.role_id,
+        r.role_name,
         u.created_at,
         u.updated_at,
         u.created_by,
         u.updated_by
     FROM users u
+    INNER JOIN user_roles ur
+        ON u.user_id = ur.user_id
+    INNER JOIN roles r
+        ON ur.role_id = r.role_id
     LEFT JOIN departments d
         ON u.department_id = d.department_id
     ORDER BY u.user_id;
@@ -209,6 +215,35 @@ export async function deactivateUserById(
     UPDATE users
     SET
         is_active = false,
+        updated_by =  $1,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE user_id = $2
+    RETURNING
+        user_id,
+        first_name,
+        last_name,
+        email,
+        is_active,
+        updated_at,
+        updated_by;
+    `;
+
+    const values = [updated_by, user_id];
+
+    const { rows } = await connection.query(sql, values);
+
+    return rows [0];
+}
+
+export async function activateUserById(
+        user_id, 
+        updated_by, 
+        connection = pool
+    ) {
+    const sql = `
+    UPDATE users
+    SET
+        is_active = true,
         updated_by =  $1,
         updated_at = CURRENT_TIMESTAMP
     WHERE user_id = $2
