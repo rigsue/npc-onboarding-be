@@ -16,6 +16,7 @@ const corsOPtions = {
         'http://localhost:5173',
         'http://192.168.60.48:5173',
         'http://192.168.1.176:5173',
+        'http://10.110.198.217:5173',
     ],
     credentials: true,
     optionsSuccessStatus: 200

@@ -6,7 +6,8 @@ import {
     getUserById,
     updateUser,
     updatePassword,
-    deactivateUser
+    deactivateUser,
+    activateUser
 } from "../controllers/userController.js";
 
 import { 
@@ -22,5 +23,6 @@ router.get("/:id/get-user", verifyToken, verifySuperAdmin, getUserById);
 router.put("/:id/update-user", verifyToken, verifySuperAdmin, updateUser)
 router.patch("/:id/password", verifyToken, verifySuperAdmin, updatePassword);
 router.patch("/:id/deactivate", verifyToken, verifySuperAdmin, deactivateUser);
+router.patch("/:id/activate", verifyToken, verifySuperAdmin, activateUser);
 
 export default router;

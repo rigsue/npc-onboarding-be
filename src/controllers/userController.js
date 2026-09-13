@@ -7,7 +7,8 @@ import {
     findUserById,
     updateUserById,
     updateUserPassword,
-    deactivateUserById
+    deactivateUserById,
+    activateUserById
  } from "../models/userModel.js";
 
 import { createUserRole } from "../models/userRoleModel.js";
@@ -210,7 +211,8 @@ export async function deactivateUser(req, res, next) {
 
         if (!deactivatedUser) {
             return res.status(404).json({
-                message: "User not found"
+                message: "User not found",
+                data: deactivatedUser
             });
         }
 
@@ -218,6 +220,29 @@ export async function deactivateUser(req, res, next) {
                 message: "User deleted successfull"
         });
 
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function activateUser(req, res, next) {
+    try{
+        const { id } = req.params;
+
+        const user = await activateUserById(
+            id,
+            req.user.user_id
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found."
+            });
+        }
+        return res.status(200).json({
+            message: "User has been activated successfully",
+            data: user
+        });
     } catch (error) {
         next(error);
     }
