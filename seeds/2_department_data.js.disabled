@@ -3,28 +3,28 @@ export async function seed(knex) {
 
   await knex("departments").insert([
     {
-      department_name: "Service Delivery Group",
+      department_name: "Service Delivery",
       description: "Empower & protect our digital world.",
 // We engineer, integrate, and support the critical cyber security and network infrastructure that keeps internal teams and external clients running seamlessly and securely."
     },
     {
-      department_name: "People and Culture Department",
+      department_name: "People and Culture",
       description: "We are HR! and Admin! and ... and ...",
     },
     {
-      department_name: "Project Management Department",
+      department_name: "Project Management",
       description: "I was previously alone but now I am not",
     },
     {
-      department_name: "Presales Group",
+      department_name: "Presales",
       description: "We are Product Architects!",
     },
     {
-      department_name: "Enterprise Sales Group",
+      department_name: "Enterprise Sales",
       description: "More benta more fun!",
     },
     {
-      department_name: "Marketing Department",
+      department_name: "Marketing",
       description: "I was alone but now I am not. haha!"
     },
     {
@@ -32,11 +32,11 @@ export async function seed(knex) {
       description: "Nice and beauties",
     },
     {
-      department_name: "Customer Success Group",
+      department_name: "Customer Success",
       description: "Magaganda yarn? :D",
     },
     {
-      department_name: "Accounting and Finance Department",
+      department_name: "Accounting and Finance",
       description: "Christmas Bonus sana",
     },
   ]);

@@ -31,7 +31,6 @@ export async function up(knex) {
     table.unique([ "exam_attempt_id", "question_id"]);
   });
 };
-
 export async function down(knex) {
   await knex.schema.dropTableIfExists("exam_attempt_answers");
 };

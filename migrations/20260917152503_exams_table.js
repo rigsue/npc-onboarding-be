@@ -1,5 +1,5 @@
-
 export async function up(knex) {
+  
   await knex.schema.createTable("exams", (table) => {
     table.increments("exam_id").primary();
 
@@ -12,14 +12,14 @@ export async function up(knex) {
     table.string("title", 100).notNullable();
 
     table.integer("passing_score")
-    .notNullable()
-    .checkBetween([0, 100]);
+        .notNullable()
+        .checkBetween([0, 100]);
 
     table.integer("attempt_limit").nullable();
 
     table.boolean("is_active")
-    .notNullable()
-    .defaultTo(true);
+        .notNullable()
+        .defaultTo(true);
 
     table.integer("created_by")
         .notNullable()
@@ -28,8 +28,8 @@ export async function up(knex) {
         .onDelete("RESTRICT");
     
     table.timestamp("created_at")
-    .notNullable()
-    .defaultTo(knex.fn.now());
+        .notNullable()
+        .defaultTo(knex.fn.now());
 
     table.integer("updated_by")
         .nullable()
@@ -44,7 +44,6 @@ export async function up(knex) {
     table.unique(["learn_mod_id", "title"])
   })
 };
-
 export async function down(knex) {
   await knex.schema.dropTableIfExists("exams");
 };

@@ -13,19 +13,21 @@ export async function seed(knex) {
   await knex.transaction(async (trx) => {
     const [user] = await trx("users")
       .insert({
+        employee_number: "N0187",
         first_name: "Richard",
         last_name: 'Regala',
         email: 'richardbregala60521@gmail.com',
+        contact_number: "+639123456789",
+        position: "IT",
         password_hash: passwordHash,
         is_active: true,
-        department_id: 19,
-        contact_number: "+639123456789",
+        department_id: 1,
       })
       .returning("user_id");
 
       await trx("user_roles").insert({
         user_id: user.user_id,
-        role_id: 6,
+        role_id: 3,
         updated_by: user.user_id
       });
 });

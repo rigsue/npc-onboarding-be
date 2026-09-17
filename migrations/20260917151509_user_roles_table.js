@@ -1,7 +1,3 @@
-/*
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
 export async function up(knex) {
   await knex.schema.createTable("user_roles", (table) => {
     table.increments("user_role_id").primary();
@@ -30,11 +26,6 @@ export async function up(knex) {
     table.unique(["user_id", "role_id"]);
   })
 };
-
-/*
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
 export async function down(knex) {
   await knex.schema.dropTableIfExists("user_roles");
 };

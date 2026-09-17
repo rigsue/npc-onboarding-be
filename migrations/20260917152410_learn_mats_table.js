@@ -1,4 +1,5 @@
 export async function up(knex) {
+
   await knex.schema.createTable("learning_materials", (table) => {
     table.increments("learn_mat_id").primary();
 
@@ -10,6 +11,10 @@ export async function up(knex) {
 
     table.string("title", 100).notNullable();
     table.string("description", 200).nullable();
+
+    table.integer("min_duration_minutes")
+        .notNullable()
+        .defaultTo(5);
 
     table.string("material_type", 50).notNullable();
 
@@ -31,8 +36,8 @@ export async function up(knex) {
         .onDelete("RESTRICT");
     
     table.timestamp("created_at")
-    .notNullable()
-    .defaultTo(knex.fn.now());
+        .notNullable()
+        .defaultTo(knex.fn.now());
 
     table.integer("updated_by")
         .nullable()
@@ -48,8 +53,6 @@ export async function up(knex) {
 
   })
 };
-
-
 export async function down(knex) {
   await knex.schema.dropTableIfExists("learning_materials");
 };
