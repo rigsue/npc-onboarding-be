@@ -1,0 +1,9 @@
+export async function seed(knex) {
+
+  await knex("roles").insert([
+
+    {role_name: "Local account"},
+    {role_name: "Admin"},
+    {role_name: "Super admin"}
+  ])
+};

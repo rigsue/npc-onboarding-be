@@ -1,15 +1,10 @@
 export async function up(knex) {
-  await knex.schema.createTable("choices", (table) => {
-    table.increments("choice_id").primary();
+  
+  await knex.schema.createTable("learning_module", (table) => {
+    table.increments("learn_mod_id").primary();
 
-    table.integer("question_id")
-        .notNullable()
-        .references("question_id")
-        .inTable("questions")
-        .onDelete("CASCADE");
-
-    table.string("choice_text", 500).nullable();
-    table.boolean("is_correct").notNullable().defaultTo(false);
+    table.string("title", 100).notNullable();
+    table.text("description").notNullable();
     table.integer("display_order").notNullable();
     table.boolean("is_active").notNullable().defaultTo(true);
 
@@ -18,25 +13,22 @@ export async function up(knex) {
         .references("user_id")
         .inTable("users")
         .onDelete("RESTRICT");
-    
+
     table.timestamp("created_at")
-    .notNullable()
-    .defaultTo(knex.fn.now());
+        .notNullable()
+        .defaultTo(knex.fn.now());
 
     table.integer("updated_by")
         .nullable()
         .references("user_id")
         .inTable("users")
         .onDelete("SET NULL");
-
+        
     table.timestamp("updated_at")
-        .notNullable()
+        .nullable()
         .defaultTo(knex.fn.now());
-
-    table.unique(["question_id", "display_order"]);
   });
-};
-
+}
 export async function down(knex) {
-  await knex.schema.dropTableIfExists("choices");
+  await knex.schema.dropTableIfExists("learning_module");
 };

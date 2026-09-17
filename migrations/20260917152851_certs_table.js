@@ -1,4 +1,5 @@
 export async function up(knex) {
+    
   await knex.schema.createTable("certificates", (table) => {
     table.increments("cert_id").primary();
 
@@ -40,7 +41,6 @@ export async function up(knex) {
     table.unique(["user_progress_id", "user_id"]);
   });
 };
-
 export async function down(knex) {
   await knex.schema.dropTableIfExists("certificates");
 };

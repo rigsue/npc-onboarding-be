@@ -1,4 +1,5 @@
 export async function up(knex) {
+  
   await knex.schema.createTable("notifications", (table) => {
     table.increments("notification_id").primary();
 
@@ -23,7 +24,6 @@ export async function up(knex) {
         .defaultTo(knex.fn.now()); 
   })
 };
-
 export async function down(knex) {
   await knex.schema.dropTableIfExists("notifications");
 };
