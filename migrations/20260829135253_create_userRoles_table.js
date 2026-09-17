@@ -7,14 +7,12 @@ export async function up(knex) {
     table.increments("user_role_id").primary();
 
     table.integer("user_id")
-        .unsigned()
         .notNullable()
         .references("user_id")
         .inTable("users")
         .onDelete("CASCADE");
 
     table.integer("role_id")
-        .unsigned()
         .notNullable()
         .references("role_id")
         .inTable("roles")
