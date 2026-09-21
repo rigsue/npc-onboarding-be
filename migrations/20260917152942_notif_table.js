@@ -15,8 +15,8 @@ export async function up(knex) {
         .inTable("user_progress")
         .onDelete("SET NULL");
 
-    table.string("notifications_type", 50).notNullable();
-    table.string("title", 50).notNullable();
+    table.string("notification_type", 50).notNullable();
+    table.string("title", 150).notNullable();
     table.string("description", 250).nullable();
 
     table.timestamp("created_at")

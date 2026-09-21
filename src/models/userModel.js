@@ -10,10 +10,12 @@ export async function createUser(user, connection = pool) {
         is_active,
         department_id,
         contact_number,
+        employee_number,
+        position,
         created_by,
         updated_by
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     RETURNING
         user_id,
         first_name,
@@ -22,6 +24,8 @@ export async function createUser(user, connection = pool) {
         is_active,
         department_id,
         contact_number,
+        employee_number,
+        position,
         created_at,
         updated_at,
         created_by,
@@ -35,6 +39,8 @@ export async function createUser(user, connection = pool) {
         user.isActive,
         user.departmentId,
         user.contactNumber,
+        user.employeeNumber,
+        user.position,
         user.createdBy,
         user.updatedBy
     ];
@@ -53,6 +59,8 @@ export async function findUserByEmail(email, connection = pool) {
         u.password_hash,
         u.is_active,
         u.contact_number,
+        u.employee_number,
+        u.position,
         r.role_id,
         r.role_name,
         d.department_name
@@ -61,7 +69,7 @@ export async function findUserByEmail(email, connection = pool) {
         ON u.user_id = ur.user_id
     INNER JOIN roles r
         ON ur.role_id = r.role_id
-    LEFT JOIN departments d
+    INNER JOIN departments d
         ON u.department_id = d.department_id
     WHERE u.email = $1;
     `;
@@ -83,7 +91,9 @@ export async function findAllUsers(connection = pool) {
         u.is_active,
         d.department_id,
         d.department_name,
-        u.contact_number,        
+        u.contact_number,  
+        u.employee_number,
+        u.position,      
         r.role_id,
         r.role_name,
         u.created_at,
@@ -95,7 +105,7 @@ export async function findAllUsers(connection = pool) {
         ON u.user_id = ur.user_id
     INNER JOIN roles r
         ON ur.role_id = r.role_id
-    LEFT JOIN departments d
+    INNER JOIN departments d
         ON u.department_id = d.department_id
     ORDER BY u.user_id;
     `;
@@ -116,12 +126,14 @@ export async function findUserById(user_id, connection = pool) {
         d.department_id,
         d.department_name,
         u.contact_number,
+        u.employee_number,
+        u.position,
         u.created_at,
         u.updated_at,
         u.created_by,
         u.updated_by
     FROM users u
-    LEFT JOIN departments d
+    INNER JOIN departments d
         ON u.department_id = d.department_id
     WHERE u.user_id = $1;
     `;
@@ -145,17 +157,23 @@ export async function updateUserById(
         last_name = $2,
         email = $3,
         is_active = $4,
-        department_name = $5,
-        updated_by = $6,
+        department_id = $5,
+        contact_number = $6,
+        employee_number = $7,
+        position = $8,
+        updated_by = $9,
         updated_at = CURRENT_TIMESTAMP
-    WHERE user_id = $7
+    WHERE users.user_id = $10
     RETURNING
         user_id,
         first_name,
         last_name,
         email,
         is_active,
-        department_name,
+        department_id,
+        contact_number,
+        employee_number,
+        position,
         created_at,
         updated_at,
         created_by,
@@ -167,7 +185,10 @@ export async function updateUserById(
         user.lastName,
         user.email,
         user.isActive,
-        user.departmentName,
+        user.departmentId,
+        user.contactNumber,
+        user.employeeNumber,
+        user.position,
         user.updatedBy,
         user_id
     ]
@@ -190,10 +211,6 @@ export async function updateUserPassword(
     WHERE user_id = $2
     RETURNING
         user_id,
-        first_name,
-        last_name,
-        email,
-        is_active,
         updated_at;
     `;
 

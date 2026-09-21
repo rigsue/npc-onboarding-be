@@ -1,9 +1,6 @@
 export async function up(knex) {
   await knex.schema.createTable("notification_recipients", (table) => {
-    
-    table
-      .increments("notification_recipient_id")
-      .primary();
+    table.increments("notification_recipient_id").primary();
 
     table
       .integer("notification_id")

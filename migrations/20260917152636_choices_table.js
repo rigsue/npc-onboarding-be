@@ -9,10 +9,19 @@ export async function up(knex) {
         .inTable("questions")
         .onDelete("CASCADE");
 
-    table.string("choice_text", 500).nullable();
-    table.boolean("is_correct").notNullable().defaultTo(false);
-    table.integer("display_order").notNullable();
-    table.boolean("is_active").notNullable().defaultTo(true);
+    table.string("choice_text", 500).notNullable();
+
+    table.boolean("is_correct")
+        .notNullable()
+        .defaultTo(false);
+
+    table.integer("display_order")
+        .notNullable()
+        .defaultTo(0);
+
+    table.boolean("is_active")
+        .notNullable()
+        .defaultTo(true);
 
     table.integer("created_by")
         .notNullable()

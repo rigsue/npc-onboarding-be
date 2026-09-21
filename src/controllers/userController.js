@@ -24,6 +24,8 @@ export async function createUserControl(req, res, next) {
             roleId,
             departmentId,
             contactNumber,
+            employeeNumber,
+            position,
         } = req.body;
 
 //  -   -   Basic validation    -   -
@@ -59,6 +61,8 @@ export async function createUserControl(req, res, next) {
             departmentId,
             roleId,
             contactNumber,
+            employeeNumber,
+            position,
             createdBy: req.user?.user_id || null,
             updatedBy: req.user?.user_id || null
         };
@@ -131,11 +135,14 @@ export async function updateUser(req, res, next) {
             lastName,
             email,
             isActive,
-            departmentName,
-            contactNumber
+            departmentId,
+            contactNumber,
+            employeeNumber,
+            position,
+            roleId,
         } = req.body;
 
-        if (!firstName || !lastName || !email || departmentName) {
+        if (!firstName || !lastName || !email || !departmentId) {
             return res.status(400).json({
                 message: "Name, email and password are requireder."
             });
@@ -148,8 +155,11 @@ export async function updateUser(req, res, next) {
                 lastName,
                 email,
                 isActive,
-                departmentName,
+                departmentId,
                 contactNumber,
+                employeeNumber,
+                position,
+                roleId,
                 updatedBy: req.user.user_id
             }
         );

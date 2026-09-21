@@ -13,9 +13,18 @@ export async function up(knex) {
         .references("role_id")
         .inTable("roles")
         .onDelete("CASCADE");
-    
-    table.integer("updated_by")
+
+    table.integer("created_by")
+        .nullable()
+        .references("user_id")
+        .inTable("users");
+
+    table.timestamp("created_at")
         .notNullable()
+        .defaultTo(knex.fn.now());
+
+    table.integer("updated_by")
+        .nullable()
         .references("user_id")
         .inTable("users");
 
@@ -24,7 +33,7 @@ export async function up(knex) {
         .defaultTo(knex.fn.now());
 
     table.unique(["user_id", "role_id"]);
-  })
+  });
 };
 export async function down(knex) {
   await knex.schema.dropTableIfExists("user_roles");

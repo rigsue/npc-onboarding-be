@@ -20,7 +20,7 @@ const router = Router();
 router.post("/create-user", verifyToken, verifySuperAdmin, createUserControl);
 router.get("/get-users", verifyToken, verifySuperAdmin, getUsers);
 router.get("/:id/get-user", verifyToken, verifySuperAdmin, getUserById);
-router.put("/:id/update-user", verifyToken, verifySuperAdmin, updateUser)
+router.put("/:id/update-user", verifyToken, updateUser)
 router.patch("/:id/password", verifyToken, verifySuperAdmin, updatePassword);
 router.patch("/:id/deactivate", verifyToken, verifySuperAdmin, deactivateUser);
 router.patch("/:id/activate", verifyToken, verifySuperAdmin, activateUser);

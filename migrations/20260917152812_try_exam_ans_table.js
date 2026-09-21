@@ -6,7 +6,7 @@ export async function up(knex) {
         .notNullable()
         .references("exam_attempt_id")
         .inTable("exam_attempts")
-        .onDelete("RESTRICT");
+        .onDelete("CASCADE");
 
     table.integer("question_id")
         .notNullable()
@@ -22,7 +22,9 @@ export async function up(knex) {
 
     table.text("answer_text").nullable();
     table.boolean("is_correct").nullable();
-    table.decimal("points_awarded").nullable();
+    table.decimal("points_awarded", 5, 2)
+    .nullable()
+    .checkBetween([0, 999.99]);
 
     table.timestamp("answered_at")
         .notNullable()

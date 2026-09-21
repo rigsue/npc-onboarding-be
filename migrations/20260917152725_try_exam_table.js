@@ -19,10 +19,15 @@ export async function up(knex) {
         .notNullable()
         .checkPositive();
 
-    table.integer("score").notNullable();
+    table.integer("score").nullable();
     table.integer("total_points").notNullable();
-    table.decimal("percentage", 5, 2).notNullable();
-    table.boolean("is_passed").notNullable().defaultTo(false);
+
+    table.decimal("percentage", 5, 2)
+    .nullable()
+    .checkBetween([0, 100]);
+
+    table.boolean("is_passed").nullable().defaultTo(false);
+    table.timestamp("deadline_at").notNullable();
 
     table.string("status", 30)
         .notNullable()

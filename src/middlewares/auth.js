@@ -91,7 +91,7 @@ export async function createAccessToken(user) {
             })
         }
         
-        if (req.user.role === "super_admin") {
+        if (req.user.role === "Super admin") {
             next();
             
         } else {
@@ -110,8 +110,8 @@ export async function createAccessToken(user) {
             });
         }
         if(
-            req.user.role === "admin" ||
-            req.user.role === "super_admin"
+            req.user.role === "Admin" ||
+            req.user.role === "Super admin"
         ) {
             return next();
         }

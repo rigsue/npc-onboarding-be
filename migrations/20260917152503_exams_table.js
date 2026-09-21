@@ -15,11 +15,18 @@ export async function up(knex) {
         .notNullable()
         .checkBetween([0, 100]);
 
-    table.integer("attempt_limit").nullable();
+    table.integer("attempt_limit")
+        .nullable()
+        .checkBetween([1, 100]);;
 
     table.boolean("is_active")
         .notNullable()
         .defaultTo(true);
+
+    table.integer("duration_minutes")
+        .notNullable()
+        .defaultTo(30)
+        .checkBetween([1, 1440]);
 
     table.integer("created_by")
         .notNullable()

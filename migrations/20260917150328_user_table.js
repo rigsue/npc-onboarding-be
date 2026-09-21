@@ -26,7 +26,8 @@ export async function up(knex) {
     table.integer("created_by")
         .nullable()
         .references("user_id")
-        .inTable("users");
+        .inTable("users")
+        .onDelete("SET NULL");
 
     table.timestamp("updated_at")
         .nullable()
@@ -35,7 +36,9 @@ export async function up(knex) {
     table.integer("updated_by")
         .nullable()
         .references("user_id")
-        .inTable("users");
+        .inTable("users")
+        .onDelete("SET NULL");
+        
   })
 };
 export async function down(knex) {
