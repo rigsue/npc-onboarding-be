@@ -9,10 +9,15 @@ export async function up(knex) {
         .inTable("user_progress")
         .onDelete("CASCADE");
 
-    table.string("cert_number", 250).notNullable().unique();
-    table.string("cert_verification", 250).notNullable().unique();
+    table.string("cert_number", 250)
+        .notNullable()
+        .unique();
 
-    table.timestamp("issue_at")
+    table.string("cert_verification", 250)
+        .notNullable()
+        .unique();
+
+    table.timestamp("issued_at")
         .notNullable()
         .defaultTo(knex.fn.now());
 
@@ -22,7 +27,7 @@ export async function up(knex) {
         .notNullable()
         .defaultTo(false);
     
-    table.integer("user_id")
+    table.integer("revoked_by")
         .notNullable()
         .references("user_id")
         .inTable("users")
@@ -31,14 +36,12 @@ export async function up(knex) {
     table.timestamp("revoked_at").nullable();
 
     table.string("revoked_reason", 500).nullable();
-    table.string("cert_file", 500).notNullable();
-    table.string("temp_version", 100).notNullable();
+    table.string("cert_file", 500).nullable();
+    table.string("temp_version", 100).nullable();
 
     table.timestamp("created_at")
         .notNullable()
         .defaultTo(knex.fn.now());
-    
-    table.unique(["user_progress_id", "user_id"]);
   });
 };
 export async function down(knex) {

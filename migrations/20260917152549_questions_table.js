@@ -13,12 +13,17 @@ export async function up(knex) {
     table.string("question_type", 100).notNullable();
 
     table.integer("points")
-        .nullable()
+        .notNullable()
         .defaultTo(1)
         .checkPositive();
 
-    table.integer("display_order").notNullable();
-    table.boolean("is_active").notNullable().defaultTo(true);
+    table.integer("display_order")
+        .notNullable()
+        .defaultTo(0);
+
+    table.boolean("is_active")
+        .notNullable()
+        .defaultTo(true);
 
     table.integer("created_by")
         .notNullable()

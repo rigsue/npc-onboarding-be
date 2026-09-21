@@ -251,7 +251,6 @@ The frontend shall:
 The Local User interface shall include:
 
 * Login page
-* Dashboard
 * User profile
 * Assigned onboarding modules
 * Module details
@@ -260,7 +259,7 @@ The Local User interface shall include:
 * Examination page
 * Examination results
 * Certifications
-* Notifications and announcements
+* Notifications and announcements (recipient)
 * Onboarding completion status
 * Logout functionality
 
@@ -272,13 +271,13 @@ The Admin interface shall include:
 
 * Admin dashboard
 * Module management
-* Lecture management
+* Learning materials management
 * Examination management
 * Question management
 * Local User progress monitoring
 * Examination results
 * Certification management
-* Notifications and announcements
+* Notifications and announcements (receipient)
 * Admin profile
 * Logout functionality
 
@@ -290,14 +289,10 @@ The Super Admin interface shall include:
 * Local User management
 * Admin User management
 * Role and permission management
-* Module management
-* Lecture management
-* Examination management
-* Question management
 * Overall progress monitoring
 * Examination results and reports
-* Notifications and announcements
-* System management
+* Notifications and announcements (edit & create)
+* System management - (manage department)
 * Super Admin profile
 * Logout functionality
 

@@ -4,9 +4,29 @@ export async function up(knex) {
     table.increments("learn_mod_id").primary();
 
     table.string("title", 100).notNullable();
-    table.text("description").notNullable();
-    table.integer("display_order").notNullable();
-    table.boolean("is_active").notNullable().defaultTo(true);
+    table.text("description").nullable();
+    table.integer("display_order")
+        .notNullable()
+        .defaultTo(0);
+
+    table.integer("department_id")
+        .notNullable()
+        .references("department_id")
+        .inTable("departments")
+        .onDelete("RESTRICT");
+
+    table.integer("expected_duration_minutes")
+        .notNullable()
+        .defaultTo(30)
+        .checkPositive();
+
+    table.integer("time_limit_minutes")
+        .nullable()
+        .checkPositive();
+
+    table.boolean("is_active")
+        .notNullable()
+        .defaultTo(true);
 
     table.integer("created_by")
         .notNullable()
@@ -25,7 +45,7 @@ export async function up(knex) {
         .onDelete("SET NULL");
         
     table.timestamp("updated_at")
-        .nullable()
+        .notNullable()
         .defaultTo(knex.fn.now());
   });
 }

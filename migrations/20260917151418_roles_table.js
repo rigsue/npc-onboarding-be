@@ -9,7 +9,11 @@ export async function up(knex) {
     table.timestamp("created_at")
         .notNullable()
         .defaultTo(knex.fn.now());
-  })
+            
+    table.timestamp("updated_at")
+        .notNullable()
+        .defaultTo(knex.fn.now());
+  });
 };
 export async function down(knex) {
   await knex.schema.dropTableIfExists("roles");
