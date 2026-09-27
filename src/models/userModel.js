@@ -115,7 +115,7 @@ export async function findAllUsers(connection = pool) {
     return rows;
 }
 
-export async function findUserById(user_id, connection = pool) {
+export async function findUserById(userId, connection = pool) {
     const sql = `
     SELECT
         u.user_id,
@@ -138,7 +138,7 @@ export async function findUserById(user_id, connection = pool) {
     WHERE u.user_id = $1;
     `;
 
-    const values = [user_id];
+    const values = [userId];
 
     const { rows } = await connection.query(sql, values);
 
@@ -146,9 +146,7 @@ export async function findUserById(user_id, connection = pool) {
 }
 
 export async function updateUserById(
-        user_id, 
-        user, 
-        connection = pool
+        userId,  user, connection = pool
     ) {
     const sql = `
     UPDATE users
@@ -162,7 +160,7 @@ export async function updateUserById(
         employee_number = $7,
         position = $8,
         updated_by = $9,
-        updated_at = CURRENT_TIMESTAMP
+        updated_at = NOW()
     WHERE users.user_id = $10
     RETURNING
         user_id,
@@ -190,7 +188,7 @@ export async function updateUserById(
         user.employeeNumber,
         user.position,
         user.updatedBy,
-        user_id
+        userId
     ]
 
     const { rows } = await connection.query(sql, values);
@@ -199,15 +197,13 @@ export async function updateUserById(
 };
 
 export async function updateUserPassword(
-        user_id, 
-        passwordHash, 
-        connection = pool
+        userId, passwordHash, connection = pool
     ) {
     const sql = `
     UPDATE users 
     SET
         password_hash = $1,
-        updated_at = CURRENT_TIMESTAMP
+        updated_at = NOW()
     WHERE user_id = $2
     RETURNING
         user_id,
@@ -215,7 +211,7 @@ export async function updateUserPassword(
     `;
 
     const values = [
-        passwordHash, user_id
+        passwordHash, userId
     ];
 
     const { rows } = await connection.query(sql, values);
@@ -224,16 +220,14 @@ export async function updateUserPassword(
 }
 
 export async function deactivateUserById(
-        user_id, 
-        updated_by, 
-        connection = pool
+        userId, updatedBy, connection = pool
     ) {
     const sql = `
     UPDATE users
     SET
         is_active = false,
         updated_by =  $1,
-        updated_at = CURRENT_TIMESTAMP
+        updated_at = NOW()
     WHERE user_id = $2
     RETURNING
         user_id,
@@ -245,7 +239,7 @@ export async function deactivateUserById(
         updated_by;
     `;
 
-    const values = [updated_by, user_id];
+    const values = [updatedBy, userId];
 
     const { rows } = await connection.query(sql, values);
 
@@ -253,16 +247,14 @@ export async function deactivateUserById(
 }
 
 export async function activateUserById(
-        user_id, 
-        updated_by, 
-        connection = pool
+        userId, updatedBy, connection = pool
     ) {
     const sql = `
     UPDATE users
     SET
         is_active = true,
         updated_by =  $1,
-        updated_at = CURRENT_TIMESTAMP
+        updated_at = NOW()
     WHERE user_id = $2
     RETURNING
         user_id,
@@ -274,7 +266,7 @@ export async function activateUserById(
         updated_by;
     `;
 
-    const values = [updated_by, user_id];
+    const values = [updatedBy, userId];
 
     const { rows } = await connection.query(sql, values);
 

@@ -4,7 +4,7 @@ import {
     findDepartmentById,
     updateDepartmentById,
     deactivateDepartmentById
-} from "../models/departmentModel.js";
+} from "../models/deptModel.js";
 
 export async function createDepartment(req, res, next) {
     try {
@@ -25,15 +25,20 @@ export async function createDepartment(req, res, next) {
             departmentName,
             description,
             isActive: isActive ?? true,
-            createdBy: req.user.user_id,
-            updatedBy: req.user.user_id
+            createdBy: req.user.userId,
+            updatedBy: req.user.userId
         });
+        return res.status(201).json({
+            message:"Successfully created a department",
+            data: department
+        });
+
     } catch (error) {
         next(error);
     }
 }
 
-export async function getAllDepartments(req, res, next) {
+export async function getAllDepartments(_req, res, next) {
     try{
         const departments = await findAllDepartments();
 
@@ -48,9 +53,9 @@ export async function getAllDepartments(req, res, next) {
 
 export async function getDepartmentById(req, res, next) {
     try{
-        const { department_id } = req.params;
+        const { departmentId } = req.params;
 
-        const department = await findDepartmentById(department_id);
+        const department = await findDepartmentById(departmentId);
 
         if(!department) {
             return res.status(404).json({
@@ -70,7 +75,7 @@ export async function getDepartmentById(req, res, next) {
 
 export async function updateDepartment(req, res, next) {
     try {
-        const { department_id } = req.params;
+        const { departmentId } = req.params;
 
         const {
             departmentName,
@@ -86,12 +91,12 @@ export async function updateDepartment(req, res, next) {
         }
 
         const department = await updateDepartmentById(
-            department_id,
+            departmentId,
             {
                 departmentName,
                 description,
                 isActive,
-                updatedBy: req.user.user_id
+                updatedBy: req.user.userId
             }
         );
 
@@ -113,11 +118,11 @@ export async function updateDepartment(req, res, next) {
 
 export async function deactivateDepartment(req, res, next) {
     try {
-        const { department_id } = req.params;
+        const { departmentId } = req.params;
 
         const department = await deactivateDepartmentById(
-            department_id,
-            req.user.user_id
+            departmentId,
+            req.user.userId
         );
         if(!department) {
             return res.status(404).json({
