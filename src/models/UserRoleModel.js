@@ -1,11 +1,11 @@
 import pool from "../config/db.js";
 
-export async function createUserRole(userRole, connection = pool) {
+export async function createUserRole(
+    userRole, connection = pool
+) {
     const sql = `
     INSERT INTO user_roles (
-        user_id,
-        role_id,
-        updated_by
+        user_id, role_id, updated_by
     )
     VALUES ($1, $2, $3)
     RETURNING
@@ -65,10 +65,37 @@ export async function getUsersByRoleId(roleId, connection = pool) {
     return rows;
 }
 
+export async function updateUserRole(
+    userId, roleId, updatedBy,
+    connection = pool
+) {
+    const sql = `
+        UPDATE user_roles
+        SET
+            role_id = $1,
+            updated_by = $2,
+            updated_at = NOW()
+        WHERE user_id = $3
+        RETURNING
+            user_role_id,
+            user_id,
+            role_id,
+            updated_by,
+            updated_at;
+    `;
 
-export async function removeRoleFromUser(
-    userId,
-    roleId,
+    const values = [
+        roleId, updatedBy, userId
+    ];
+
+    const { rows } = await connection.query(sql, values);
+
+    return rows[0];
+}
+
+export async function removeRoleFromUser({
+    userId, roleId,
+},
     connection = pool
 ) {
     const sql = `
@@ -82,8 +109,7 @@ export async function removeRoleFromUser(
     `;
 
     const { rows } = await connection.query(sql, [
-        userId,
-        roleId
+        userId, roleId
     ]);
 
     return rows[0];

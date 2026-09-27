@@ -8,11 +8,13 @@ const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
 //  -   -   create access token -   -
 export async function createAccessToken(user) {
     const data = {
-        user_id: user.user_id,
+        userId: user.user_id,
         email: user.email,
-        role: user.role_name,
-        department: user.department_id,
-        contact: user.contact_number
+        roleName: user.role_name,
+        departmentId: user.department_id,
+        contactNumber: user.contact_number,
+        position: user.position,
+        employeeNumber: user.employee_number
     };
     return jwt.sign(data, JWT_SECRET_KEY, {
         expiresIn: "1h"
@@ -73,12 +75,12 @@ export async function createAccessToken(user) {
             });
         } 
         
-        if (req.user.role === "admin") {
+        if (req.user.roleName === "Admin") {
             next();
         }else {
             return res.status(403).send({
                 auth: "Failed",
-                message: "Action Forbidden. Not an AdminSuper Account"
+                message: "Action Forbidden. Not an Admin Account"
             });
         }
     }
@@ -91,13 +93,13 @@ export async function createAccessToken(user) {
             })
         }
         
-        if (req.user.role === "Super admin") {
+        if (req.user.roleName === "Super admin") {
             next();
             
         } else {
             return res.status(403).send({
                 auth: "Failed",
-                message: "Action Forbidden. Not a Super Admin Account"
+                message: "Action Forbidden. Not a Super Admin Accouuunt"
             });
         }
     }
@@ -110,8 +112,8 @@ export async function createAccessToken(user) {
             });
         }
         if(
-            req.user.role === "Admin" ||
-            req.user.role === "Super admin"
+            req.user.roleName === "Admin" ||
+            req.user.roleName === "Super admin"
         ) {
             return next();
         }

@@ -1,9 +1,6 @@
-import {
-    findAllRoles,
-    findRoleById
-} from "../models/roleModel.js";
+import { findAllRoles, findRoleById} from "../models/roleModel.js";
 
-export async function getRoles(req, res, next) {
+export async function getRoles(_req, res, next) {
     try {
         const roles = await findAllRoles();
 
@@ -15,7 +12,7 @@ export async function getRoles(req, res, next) {
     }
 }
 
-export async function getRoleById(res, req, next) {
+export async function getRoleById(req, res, next) {
     try {
         const { id } = req.params;
 

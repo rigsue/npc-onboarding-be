@@ -1,13 +1,22 @@
-export function errorHandler(err, req, res, next) {
+export function errorHandler(err, _req, res, _next) {
     console.error(err);
 
     const statusCode = err.status || 500;
 
     res.status(statusCode).json({
         error: {
-            message: err.message || "Internal Server Error",
-            errorCode: err.code || "server_error",
-            details: err.details
+            message: 
+                statusCode === 500
+                    ? "Internal Server Error"
+                    : err.message || "Request failed",
+
+            errorCode: 
+                err.code || "internal_server_error",
+
+            details: 
+                statusCode === 500
+                ? undefined
+                : err.details
         }
     });
 }

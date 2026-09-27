@@ -1,6 +1,6 @@
 // import {jwt} from "jsonwebtoken"
 import bcrypt from "bcrypt";
-import pool from "../config/db.js";
+import { findUserForLogin } from "../models/authModel.js";
 import { createAccessToken } from "../middlewares/auth.js";
 
 export async function login(req, res, next) {
@@ -14,55 +14,22 @@ export async function login(req, res, next) {
             );
             
             error.status = 400;
-            error.errorCode = "missing_credentials";
+            error.code = "missing_credentials";
 
             throw error;
         }
+        // -    -   find user   -   -
+        const user = await findUserForLogin(email);
 
-        //  -   -   find user   -   -
-        const result = await pool.query(
-            `
-            SELECT
-                u.user_id,
-                u.first_name,
-                u.last_name,
-                u.email,
-                u.password_hash,
-                u.is_active,
-                u.contact_number,
-                r.role_id,
-                r.role_name,
-                d.department_name
-
-            FROM users u
-            INNER JOIN user_roles ur
-                ON u.user_id = ur.user_id
-            INNER JOIN roles r
-                ON ur.role_id = r.role_id
-            LEFT JOIN departments d
-                ON u.department_id = d.department_id
-            WHERE u.email = $1
-            `,
-            [email]
-        );
-
-        //  -   -   check user if exist   -   -
-        if (result.rows.length === 0) {
+        if(!user) {
             const error = new Error(
-                "Invalides email or password"
-            );
-            error.status = 402;
-            error.code = "invalid_credentials";
+                "Invalid email or password"
+        )
+        error.status = 401;
+        error.code = "invalid_credentials";
 
-            throw error;
-        }
-
-        const user = result.rows[0];
-
-        // check if superAdmin is unable to create User
-/*         console.log("LOGIN USER:");
-        console.log(user);
-        console.log("ROLE:", user.role_name); */
+        throw error;
+    }
 
     //  -   -   Check user if active    -   -
         if (!user.is_active) {
@@ -98,14 +65,16 @@ export async function login(req, res, next) {
                 message: "Login successful", 
                 
                 user: {
-                    user_id: user.user_id,
-                    first_name: user.first_name,
-                    last_name: user.last_name,
+                    userId: user.user_id,
+                    firstName: user.first_name,
+                    lastName: user.last_name,
                     email: user.email,
-                    role_name: user.role_name,
-                    is_active: user.is_active,
-                    contact_number: user.contact_number,
-                    department_name: user.department_name,
+                    roleName: user.role_name,
+                    isActive: user.is_active,
+                    position: user.position,
+                    employeeNumber: user.employee_number,
+                    contactNumber: user.contact_number,
+                    departmentName: user.department_name,
                 },
                 token: token
             });
@@ -115,8 +84,12 @@ export async function login(req, res, next) {
     }
 }
 
-export async function logout(req, res) {
-    return res.status(200).json({
-        message: "Logout successful"
-    });
+export async function logout(_req, res, next) {
+   try { 
+        return res.status(200).json({
+            message: "Logout successful"
+        });
+    } catch (error) {
+        next(error);
+    }
 }

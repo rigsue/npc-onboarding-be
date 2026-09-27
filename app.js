@@ -4,7 +4,18 @@ import cors from 'cors';
 import authRoutes from "./src/routes/authRoute.js";
 import userRoutes from "./src/routes/userRoute.js";
 import roleRoutes from "./src/routes/roleRoute.js";
-import departmentRoutes from "./src/routes/departmentRoute.js";
+import departmentRoutes from "./src/routes/deptRoute.js";
+import learnModRoutes from "./src/routes/learnModRoute.js";
+import learnMatRoutes from "./src/routes/learnMatRoute.js";
+import examRoutes from "./src/routes/examRoute.js";
+import questionRoutes from "./src/routes/questionRoute.js";
+import choiceRoutes from "./src/routes/choiceRoute.js";
+import examAttemptRoutes from "./src/routes/examAttRoutes.js";
+import examAttemptAnsRoutes from "./src/routes/examAttAnsRoute.js";
+import userProgressRoutes from "./src/routes/userProgrsRoute.js";
+import userMatProgressRoutes from "./src/routes/userMatProgrsRoute.js";
+import certificateRoutes from "./src/routes/certsRoutes.js";
+import notificationRoutes from "./src/routes/notifRoute.js";
 
 import { errorHandler } from "./src/middlewares/errorHandler.js";
 
@@ -31,6 +42,17 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/role", roleRoutes);
 app.use("/department", departmentRoutes);
+app.use("/module", learnModRoutes);
+app.use("/material", learnMatRoutes);
+app.use("/exam", examRoutes);
+app.use("/question", questionRoutes);
+app.use("/choice", choiceRoutes);
+app.use("/exam-attempt", examAttemptRoutes);
+app.use("exam-att-ans", examAttemptAnsRoutes);
+app.use("/user-progress", userProgressRoutes);
+app.use("/user-mat-progress", userMatProgressRoutes);
+app.use("/certificate", certificateRoutes);
+app.use("/notification", notificationRoutes);
 
 app.use(errorHandler);
 

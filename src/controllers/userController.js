@@ -1,5 +1,5 @@
+import pool from "../config/db.js";
 import bcrypt from "bcrypt";
-// import user from "../models/userModels";
 import { 
     createUser,
     findUserByEmail,
@@ -11,9 +11,13 @@ import {
     activateUserById
  } from "../models/userModel.js";
 
-import { createUserRole } from "../models/userRoleModel.js";
+import { 
+    createUserRole, updateUserRole 
+    } from "../models/userRoleModel.js";
 
 export async function createUserControl(req, res, next) {
+    const connection = await pool.connect();
+
     try {
         const {
             firstName,
@@ -36,14 +40,18 @@ export async function createUserControl(req, res, next) {
             || !roleId 
             || !departmentId
         ) {
+            connection.release();
+
             return res.status(400).json({
                 message: "Name, email, password, roles and department are required."
             });
         }
 //  -   -   check email if exist    -   -
-        const existUser = await findUserByEmail(email);
+        const existUser = await findUserByEmail(email, connection);
 
         if (existUser) {
+            connection.release();
+
             return res.status(409).json({
                 message: "Email already exist."
             });
@@ -63,17 +71,27 @@ export async function createUserControl(req, res, next) {
             contactNumber,
             employeeNumber,
             position,
-            createdBy: req.user?.user_id || null,
-            updatedBy: req.user?.user_id || null
+            createdBy: req.user?.userId || null,
+            updatedBy: req.user?.userId || null
         };
+        //  -   - TRANSACTION starts here   -   -
+        await connection.query("BEGIN");
 
-        const newUser = await createUser(userData);
+        //  -   -   Create user -   -
+        const newUser = await createUser(userData, connection);
 
+        //  -   -   Create role assignment  -   -
         const newUserRole = await createUserRole({
-            userId: newUser.user_id,
-            roleId: roleId,
-            updatedBy: req.user.user_id
-        });
+                userId: newUser.user_id,
+                roleId: roleId,
+                updatedBy: req.user.userId
+        },
+            connection
+    );
+    //  -   -   commit TRANSACTION  -   -
+        await connection.query("COMMIT");
+
+        connection.release();
 
         return res.status(201).json({
             message: "User has been created successfully",
@@ -84,11 +102,14 @@ export async function createUserControl(req, res, next) {
         });
         
     } catch (error) {
+        //  -   -   rollback TRANSACTION    -   -
+        await connection.query("ROLLBACK");
+        connection.release();
         next(error);
     }
 }
 
-export async function getUsers(req, res, next) {
+export async function getUsers(_req, res, next) {
     try {
         // console.log("GET USERS: controller reached");
         const users = await findAllUsers();
@@ -107,10 +128,10 @@ export async function getUsers(req, res, next) {
 
 export async function getUserById(req, res, next) {
     try {
-        const { user_id } = req.params;
+        const { id } = req.params;
 
 
-        const user = await findUserById(user_id);
+        const user = await findUserById(id);
 
         if(!user) {
             return res.status(404).json({
@@ -127,6 +148,8 @@ export async function getUserById(req, res, next) {
 }
 
 export async function updateUser(req, res, next) {
+        const connection = await pool.connect();
+
     try {
         const { id } = req.params;
 
@@ -144,12 +167,26 @@ export async function updateUser(req, res, next) {
 
         if (!firstName || !lastName || !email || !departmentId) {
             return res.status(400).json({
-                message: "Name, email and password are requireder."
+                message: "Name, email, department, role, position, empNUmber requireder."
             });
         }
 
+        const targetUserId = Number(id);
+        const loggedInUserId = Number(req.user.userId);
+        const loggedInRole = req.user.roleName;
+
+        const isSuperAdmin = loggedInRole === "Super admin";
+        const isOwnAccount = loggedInUserId === targetUserId;
+
+        if(!isSuperAdmin && !isOwnAccount) {
+            return res.status(403).json({
+                error: "Not authorized to change here"
+            });
+        }
+        await connection.query("BEGIN");
+
         const updatedUser = await updateUserById(
-            id,
+            targetUserId,
             {
                 firstName,
                 lastName,
@@ -159,21 +196,44 @@ export async function updateUser(req, res, next) {
                 contactNumber,
                 employeeNumber,
                 position,
-                roleId,
-                updatedBy: req.user.user_id
-            }
+                updatedBy: req.user.userId
+            },
+            connection
         );
 
         if (!updatedUser) {
+            await connection.query("ROLLBACK");
+            connection.release();
+
             return res.status(404).json({
                 message: "User was not found"
             });
         }
+
+        const updatedUserRole = await updateUserRole(
+            
+            targetUserId,
+            roleId,
+            req.user.userId,
+            connection
+        );
+
+        await connection.query("COMMIT");
+
+        connection.release();
+
         return res.status(200).json({
             message: "User has been updated successfully",
-            user: updatedUser
+            data: {
+                user: updatedUser,
+                role: updatedUserRole
+            }
         });
+
     } catch (error) {
+        await connection.query("ROLLBACK");
+        connection.release();
+
         next(error);
     }
     
@@ -190,10 +250,23 @@ export async function updatePassword(req, res, next) {
             });
         }
 
+        const targetUserId = Number(id);
+        const loggedInUserId = Number(req.user.userId);
+        const loggedInRole = req.user.roleName;
+
+        const isSuperAdmin = loggedInRole ==="Super admin";
+        const isOwnAccount = loggedInUserId === targetUserId;
+
+        if(!isSuperAdmin && !isOwnAccount) {
+            return res.status(403).json({
+                error: "not authorized to change password"
+            });
+        }
+
         const passwordHash = await bcrypt.hash(password, 10);
 
         const updatedUser = await updateUserPassword(
-            id, passwordHash
+            targetUserId, passwordHash
         );
 
         if (!updatedUser) {
@@ -216,7 +289,7 @@ export async function deactivateUser(req, res, next) {
 
         const deactivatedUser = await deactivateUserById(
             id,
-        req.user.user_id
+        req.user.userId
     );
 
         if (!deactivatedUser) {
@@ -227,7 +300,7 @@ export async function deactivateUser(req, res, next) {
         }
 
         return res.status(200).json({
-                message: "User deleted successfull"
+                message: "User deactivated successfully"
         });
 
     } catch (error) {
@@ -241,7 +314,7 @@ export async function activateUser(req, res, next) {
 
         const user = await activateUserById(
             id,
-            req.user.user_id
+            req.user.userId
         );
 
         if (!user) {

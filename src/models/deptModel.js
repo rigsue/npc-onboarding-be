@@ -1,6 +1,6 @@
 import pool from "../config/db.js";
 
-export async function makeDepartment(department, connection = pool) {
+export async function makeDepartment({department}, connection = pool) {
     const sql = `
     INSERT INTO departments (
         department_name,
@@ -9,7 +9,7 @@ export async function makeDepartment(department, connection = pool) {
         created_by,
         updated_by
     )
-    VALUES ($1, $2, $3, $4, $5,)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING
         department_id,
         department_name,
@@ -51,7 +51,8 @@ export async function findAllDepartments(connection = pool) {
     return rows;
 }
 
-export async function findDepartmentById(department_id, connection = pool) {
+export async function findDepartmentById(
+    {departmentId}, connection = pool) {
     const sql = `
     SELECT
         department_id,
@@ -65,7 +66,7 @@ export async function findDepartmentById(department_id, connection = pool) {
     FROM departments
     WHERE department_id = $1;
     `;
-    const values= [department_id];
+    const values= [departmentId];
 
     const { rows } = await connection.query(sql, values);
 
@@ -73,8 +74,8 @@ export async function findDepartmentById(department_id, connection = pool) {
 };
 
 export async function updateDepartmentById(
-    department_id, 
-    department, 
+    {departmentId, 
+    department}, 
     connection = pool
 ) {
     const sql = `
@@ -84,7 +85,7 @@ export async function updateDepartmentById(
         description = $2,
         is_active = $3,
         updated_by = $4,
-        updated_at = $5 = CURRENT_TIMESTAMP
+        updated_at = $5 = NOW()
     WHERE department_id = $6
     RETURNING
         department_id,
@@ -101,21 +102,21 @@ export async function updateDepartmentById(
         department.description,
         department.isActive,
         department.updatedBy,
-        department_id
+        departmentId
     ];
     const  { rows } = await connection.query(sql, values);
     return rows [0];
 };
 
 export async function deactivateDepartmentById(
-    department_id,
-    updated_by,
+    {departmentId,
+    updatedBy},
     connection = pool
 ) {
     const sql = `
     is_active = false,
     updated_by = $1,
-    updated_at = CURRENT_TIMESTAMP
+    updated_at = NOW()
 WHERE department_id = $2
 RETURNING
     department_id,
@@ -128,7 +129,7 @@ RETURNING
     updated-by;
     `;
 
-    const values = [updated_by, department_id];
+    const values = [updatedBy, departmentId];
 
     const { rows } = await connection.query(sql, values);
 

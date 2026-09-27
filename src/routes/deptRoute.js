@@ -6,7 +6,7 @@ import {
     getDepartmentById,
     updateDepartment,
     deactivateDepartment
-} from "../controllers/departmentController.js";
+} from "../controllers/deptController.js";
 
 import { 
     verifySuperAdmin,
@@ -17,8 +17,8 @@ import {
 
  router.post("create-department", verifyToken, verifySuperAdmin, createDepartment);
  router.get("/get-departments", verifyToken, verifySuperAdmin, getAllDepartments);
- router.get("/:id/get-department", verifyToken, verifySuperAdmin, getDepartmentById);
- router.put("/:id/update-department", verifyToken, verifySuperAdmin, updateDepartment);
- router.patch("/:id/deactivate", verifyToken, verifySuperAdmin, deactivateDepartment);
+ router.get("/:department_id", verifyToken, verifySuperAdmin, getDepartmentById);
+ router.put("/:department_id", verifyToken, verifySuperAdmin, updateDepartment);
+ router.patch("/:department_id/deactivate", verifyToken, verifySuperAdmin, deactivateDepartment);
 
  export default router;
