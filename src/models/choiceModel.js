@@ -1,11 +1,11 @@
 import pool from "../config/db.js";
 
 export async function createChoice(
-    {questionId,
+    questionId,
     choiceText,
     isCorrect = false,
     displayOrder = 0,
-    createdBy},
+    createdBy,
     connection = pool
 ) {
     const sql = `
@@ -53,7 +53,7 @@ export async function findAllChoices(connection = pool) {
 }
 
 export async function findChoicesByQuesId(
-    {questionId},
+    questionId,
     connection = pool
 ) {
     const sql = `
@@ -72,13 +72,14 @@ export async function findChoicesByQuesId(
         WHERE question_id = $1
         ORDER BY display_order;
     `;
+
     const { rows } = await connection.query(sql, [questionId]);
 
     return rows;
 }
 
 export async function findChoiceById(
-    {choiceId},
+    choiceId,
     connection = pool
 ) {
     const sql = `
@@ -102,11 +103,11 @@ export async function findChoiceById(
 }
 
 export async function updateChoiceById(
-    {choiceId,
+    choiceId,
     choiceText,
     isCorrect,
     displayOrder,
-    updatedBy},
+    updatedBy,
     connection = pool
 ) {
     const sql = `
@@ -134,9 +135,9 @@ export async function updateChoiceById(
 }
 
 export async function updateChoiceStat(
-    {choiceId,
+    choiceId,
     isActive,
-    updatedBy},
+    updatedBy,
     connection = pool
 ) {
     const sql = `

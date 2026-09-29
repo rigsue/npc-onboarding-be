@@ -12,7 +12,7 @@ export async function makeCert(req, res, next) {
                 userProgressId,
                 certNumber,
                 certVerification,
-                certificateFile,
+                certFile,
                 tempVersion,
                 expiresAt
         } = req.body;
@@ -32,7 +32,7 @@ export async function makeCert(req, res, next) {
             userProgressId,
             certNumber,
             certVerification,
-            certificateFile,
+            certFile,
             tempVersion,
             expiresAt
         );

@@ -1,6 +1,6 @@
 import pool from "../config/db.js"
 
-export async function createRole({role}, connection = pool) {
+export async function createRole(role, connection = pool) {
     const sql = `
     INSERT INTO roles (
         role_name
@@ -31,7 +31,7 @@ export async function findAllRoles(connection = pool) {
     return rows;    
 }
 
-export async function findRoleById({roleId}, connection = pool) {
+export async function findRoleById(roleId, connection = pool) {
     const sql = `
     SELECT
         role_id,

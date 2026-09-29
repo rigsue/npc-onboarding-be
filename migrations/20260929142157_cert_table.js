@@ -28,7 +28,7 @@ export async function up(knex) {
         .defaultTo(false);
     
     table.integer("revoked_by")
-        .notNullable()
+        .nullable()
         .references("user_id")
         .inTable("users")
         .onDelete("CASCADE");

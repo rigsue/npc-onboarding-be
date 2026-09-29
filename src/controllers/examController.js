@@ -97,16 +97,14 @@ export async function updateExam(req, res, next) {
                 
         const updatedBy = req.user.userId;
 
-        const exam = updateExamById(
+        const exam = await updateExamById(
             examId, 
-            {
-                learnModId,
-                title,
-                passingScore,
-                attemptLimit,
-                durationMinutes,
-            },
-            updatedBy
+            {learnModId,
+            title,
+            passingScore,
+            attemptLimit,
+            durationMinutes,
+            updatedBy}
         );
         if(!exam) {
             res.status(404).json({
@@ -129,10 +127,10 @@ export async function updatedExamStat(req, res, next) {
         const updatedBy = req.user.userId;
 
         const exam = await updateExamStat(
-            examId, isActive, updatedBy
+            {examId, isActive, updatedBy}
         );
         if(!exam) {
-            res.status(404).json({
+        return res.status(404).json({
                 message: "Exam not found 3"
             });
         }

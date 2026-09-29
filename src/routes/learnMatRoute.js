@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.post("/create-material", verifyToken, verifyAdmin, createMats);
 router.get("/get-materials", verifyToken, verifyAdmin, getAllMat);
-router.get("/:learnModId", verifyToken, verifyAdmin, getMatByMod);
+router.get("/:learnModId/by-mod", verifyToken, verifyAdmin, getMatByMod);
 router.get("/:learnMatId", verifyToken, verifyAdmin, getMatById);
 router.put("/:learnMatId", verifyToken, verifyAdmin, updateMatById);
 router.patch("/:learnMatId/status", verifyToken, verifyAdmin, updateMatStat);

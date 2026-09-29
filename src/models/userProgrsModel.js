@@ -76,8 +76,7 @@ export async function findUserProgressById(
 }
 
 export async function findUserProgressByUser(
-    {userId},
-    connection = pool
+    userId, connection = pool
 ) {
     const sql = `
         SELECT
@@ -101,12 +100,11 @@ export async function findUserProgressByUser(
     return rows;
 }
 
-export async function updateUserProgress({
+export async function updateUserProgress(
     userProgressId,
     progressPercentage,
     totalTimeSpentSeconds,
     status,
-},
     connection = pool
 ) {
     const sql = `
@@ -114,28 +112,30 @@ export async function updateUserProgress({
         SET
             progress_percentage = $1,
             total_time_spent_seconds = $2,
-            status = $3,
+            status = $3::varchar,
             started_at = CASE
-        WHEN started_at IS NULL
-            AND $3 <> 'pending'
-        THEN NOW()
-        ELSE started_at
-        END,
-        completed_at = CASE
-            WHEN $3 = 'completed'
-            THEN NOW()
-            ELSE completed_at
-        END,
-        updated_at = NOW()
+                WHEN started_at IS NULL
+                    AND $3::varchar <> 'pending'
+                THEN NOW()
+                ELSE started_at
+            END,
+            completed_at = CASE
+                WHEN $3::varchar = 'completed'
+                THEN NOW()
+                ELSE completed_at
+            END,
+            updated_at = NOW()
         WHERE user_progress_id = $4
         RETURNING *;
     `;
+
     const values = [
-        userProgressId,
         progressPercentage,
         totalTimeSpentSeconds,
-        status
+        status,
+        userProgressId
     ];
+
     const { rows } = await connection.query(sql, values);
 
     return rows[0];

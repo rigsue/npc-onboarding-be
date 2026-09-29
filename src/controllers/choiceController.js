@@ -71,9 +71,9 @@ export async function getChoicesByQues(req, res, next) {
 
 export async function getChoiceById(req, res, next) {
     try {
-        const { id } = req.params;
+        const { choiceId } = req.params;
 
-        const choice = await findChoiceById(id);
+        const choice = await findChoiceById(choiceId);
 
         if (!choice) {
             const error = new Error("Choice not found");
@@ -133,28 +133,21 @@ export async function updateChoice(req, res, next) {
 
 export async function updateChoiceStatus(req, res, next) {
     try {
-        const { id } = req.params;
+        const {id} = req.params;
         const { isActive } = req.body;
+        const updatedBy = req.user.userId;
 
-        if (typeof isActive !== "boolean") {
-            const error = new Error(
-                "is_active must be a boolean"
-            );
-            error.status = 400;
-            error.code = "invalid_status";
-            throw error;
-        }
         const choice = await updateChoiceStat(
             id,
             isActive,
-            req.user.userId
+            updatedBy
         );
          if (!choice) {
-            const error = new Error("Choice not found");
-            error.status = 404;
-            error.code = "choice_not_found";
-            throw error;
-        }
+            return res.status(400).json({
+                message: "choice_not_found"
+            })
+         }
+        
         return res.status(200).json({
             message: "Choice status updated successfully",
             data: choice

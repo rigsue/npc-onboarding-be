@@ -16,7 +16,7 @@ const router = express.Router();
 router.post("/create-choices", verifyToken, verifyAdmin, makeChoice);
 router.get("/get-choice", verifyToken, getAllChoices);
 router.get("/question/:questionId", verifyToken, getChoicesByQues);
-router.get("/:id",verifyToken, getChoiceById);
+router.get("/:choiceId",verifyToken, getChoiceById);
 router.put("/:id", verifyToken, verifyAdmin, updateChoice);
 router.patch("/:id/status", verifyToken, verifyAdmin, updateChoiceStatus);
 

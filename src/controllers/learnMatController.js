@@ -63,7 +63,7 @@ export async function getAllMat(_req, res, next) {
     }
 }
 
-export async function getMatByMod(res, req, next) {
+export async function getMatByMod(req, res, next) {
     try {
         const { learnModId } = req.params;
 
@@ -142,7 +142,7 @@ export async function updateMatById(req, res, next) {
             });
         }
 
-            res.staus(200).json({
+            res.status(200).json({
                 message: "Learning materials updated successfully",
                 data: material
             });
@@ -159,7 +159,7 @@ export async function updateMatStat(req, res, next) {
 
         const updatedBy = req.user.userId;
 
-        const material = updateLearnMatStat(
+        const material = await updateLearnMatStat(
             learnMatId, isActive, updatedBy
         );
         if(!material) {
