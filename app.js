@@ -48,7 +48,7 @@ app.use("/exam", examRoutes);
 app.use("/question", questionRoutes);
 app.use("/choice", choiceRoutes);
 app.use("/exam-attempt", examAttemptRoutes);
-app.use("exam-att-ans", examAttemptAnsRoutes);
+app.use("/exam-att-ans", examAttemptAnsRoutes);
 app.use("/user-progress", userProgressRoutes);
 app.use("/user-mat-progress", userMatProgressRoutes);
 app.use("/certificate", certificateRoutes);

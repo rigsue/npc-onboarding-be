@@ -38,9 +38,9 @@ export async function createExamination({
 export async function findAllExams(connection = pool) {
     const sql = `
         SELECT
-            e.exam_id
+            e.exam_id,
             e.learn_mod_id,
-            lm.title AS module_title
+            lm.title AS module_title,
             e.title,
             e.passing_score,
             e.attempt_limit,
@@ -54,7 +54,7 @@ export async function findAllExams(connection = pool) {
         INNER JOIN learning_module lm
             ON e.learn_mod_id = lm.learn_mod_id
         ORDER BY
-            e.larn_mod_id,
+            e.learn_mod_id,
             e.exam_id;
     `;
     const { rows } = await connection.query(sql);
@@ -62,7 +62,7 @@ export async function findAllExams(connection = pool) {
 }
 
 export async function findExambyModId(
-    {learnModId}, connection = pool) {
+    learnModId, connection = pool) {
     const sql = `
         SELECT
             exam_id,
@@ -84,12 +84,12 @@ export async function findExambyModId(
     return rows[0];
 }
 
-export async function findExamById({examId}, connection = pool) {
+export async function findExamById(examId, connection = pool) {
     const sql = `
         SELECT 
-            e.exam_id
+            e.exam_id,
             e.learn_mod_id,
-            lm.title AS module_title
+            lm.title AS module_title,
             e.title,
             e.passing_score,
             e.attempt_limit,
@@ -110,16 +110,14 @@ export async function findExamById({examId}, connection = pool) {
 }
 
 export async function updateExamById(
-    examId, {
-        learnModId,
-        title,
-        passingScore,
-        attemptLimit,
-        durationMinutes,
-        updatedBy,
-    },
-        connection = pool       
-
+    examId, 
+    {learnModId,
+    title,
+    passingScore,
+    attemptLimit,
+    durationMinutes,
+    updatedBy},
+    connection = pool       
 ) {
     const sql = `
         UPDATE exams
@@ -156,7 +154,7 @@ export async function updateExamStat(
             is_active = $1,
             updated_by = $2,
             updated_at = NOW()
-        WHERE exam_id = 3
+        WHERE exam_id = $3
         RETURNING *;
     `;
     const { rows } = await connection.query(sql, [

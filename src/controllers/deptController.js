@@ -3,6 +3,7 @@ import {
     findAllDepartments,
     findDepartmentById,
     updateDepartmentById,
+    activateDepartmentById,
     deactivateDepartmentById
 } from "../models/deptModel.js";
 
@@ -120,20 +121,42 @@ export async function deactivateDepartment(req, res, next) {
     try {
         const { departmentId } = req.params;
 
-        const department = await deactivateDepartmentById(
+        const activateDept = await deactivateDepartmentById(
             departmentId,
             req.user.userId
         );
-        if(!department) {
+
+        if(!activateDept) {
             return res.status(404).json({
-                success: false,
-                message: "Department not found"
+                message: "deactivate Department not found",
+                data: activateDept
             });
         }
         return res.status(200).json({
-            success: true,
             message: "Department deactivated successfully",
-            data: department
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function activateDepartment(req, res, next) {
+    try {
+        const { departmentId } = req.params;
+
+        const activateDept = await activateDepartmentById(
+            departmentId,
+            req.user.userId
+        );
+
+        if(!activateDept) {
+            return res.status(404).json({
+                message: "activate Department not found",
+                data: activateDept
+            });
+        }
+        return res.status(200).json({
+            message: "Department activated successfully",
         });
     } catch (error) {
         next(error);

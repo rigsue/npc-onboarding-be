@@ -119,7 +119,7 @@ export async function updateModStat(req, res, next) {
         const updatedBy = req.user.userId;
 
         const module = await updateLearnModStat(
-            learnModId, isActive, updatedBy
+            {learnModId, isActive, updatedBy}
         );
         if(!module) {
             return res.status(400).json({

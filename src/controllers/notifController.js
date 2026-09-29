@@ -45,7 +45,7 @@ export async function makeNotif(req, res, next) {
         );
         for (const userId of recipients) {
             await addNotifRecipient(
-                notification.notificationId,
+                notification.notification_id,
                 userId
             );
         }

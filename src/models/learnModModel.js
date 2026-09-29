@@ -8,8 +8,9 @@ export async function createLearnMod({
     expectedDurationMinutes = 30,
     timeLimitMinutes = null,
     createdBy,
+},
     connection = pool
-}) {
+) {
     const sql = `
         INSERT INTO learning_module (
             title,
@@ -64,7 +65,7 @@ export async function findAllLearnMods(connection = pool) {
     return rows;
 }
 
-export async function findLearnModById({learnModId}, connection = pool) {
+export async function findLearnModById(learnModId, connection = pool) {
     const sql = `
     SELECT
             lm.learn_mod_id,
@@ -81,8 +82,8 @@ export async function findLearnModById({learnModId}, connection = pool) {
             lm.updated_by,
             lm.updated_at
         FROM learning_module lm
-        INNER JOIM departments d
-            ON lm.department_id = d.deparment_id
+        INNER JOIN departments d
+            ON lm.department_id = d.department_id
         WHERE lm.learn_mod_id = $1;
     `;
     const { rows } = await connection.query(sql, [learnModId]);
@@ -102,7 +103,7 @@ export async function updateLearnModById(
     }, connection = pool
  ) {
     const sql = `
-    UPDATE learning_modules
+    UPDATE learning_module
     SET
         title = $1,
         description = $2,

@@ -18,10 +18,10 @@ export async function createUserProgrs(req, res, next) {
             error.code = "missing_progress_fields";
             throw error;
         }
-        const progress = await createUserProgress(
+        const progress = await createUserProgress({
             userId,
             learnModId
-        );
+        });
         return res.status(201).json({
             message: "User progress created successfully",
             data: progress

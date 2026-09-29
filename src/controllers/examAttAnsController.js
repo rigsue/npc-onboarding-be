@@ -23,12 +23,12 @@ export async function createExamAttAnswer(req, res,next) {
             error.code = "missing_answer_fields";
             throw error;
         }
-        const answer = await createExamAttAns(
+        const answer = await createExamAttAns({
             examAttemptId,
             questionId,
             choiceId,
             answerText
-        );
+        });
         return res.status(201).json({
             message: "Exam answer submitted successfully",
             data: answer

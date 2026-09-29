@@ -1,6 +1,6 @@
 import pool from "../config/db.js";
 
-export async function createQuestion({question}, connection = pool) {
+export async function createQuestion(question, connection = pool) {
 
     const sql = `
         INSERT INTO questions (
@@ -14,7 +14,6 @@ export async function createQuestion({question}, connection = pool) {
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING
-            question_id,
             exam_id,
             question,
             question_type,
@@ -64,7 +63,7 @@ export async function findAllQuestions(connection = pool) {
 }  
 
 export async function findQuesByExamId(
-    {examId}, connection = pool
+    examId, connection = pool
 ) {
     const sql = `
         SELECT
@@ -89,7 +88,7 @@ export async function findQuesByExamId(
 }
 
 export async function findQuesById(
-    {questionId}, connection = pool
+    questionId, connection = pool
 ) {
     const sql = `
         SELECT
@@ -116,7 +115,7 @@ export async function findQuesById(
 }
 
 export async function updateQuesById(
-    {questionId, question},
+    questionId, question,
     connection = pool
 ) {
     const sql = `
@@ -153,9 +152,9 @@ export async function updateQuesById(
 }
 
 export async function updateQuesStatus(
-    {questionId,
+    questionId,
     isActive,
-    updatedBy},
+    updatedBy,
     connection = pool
 ) {
     const sql = `

@@ -107,6 +107,7 @@ export async function updateQuestion(req, res, next) {
             points,
             displayOrder
         } = req.body;
+        const updatedBy = req.user.userId;
 
         if (!question || !questionType) {
 
@@ -126,7 +127,7 @@ export async function updateQuestion(req, res, next) {
                 questionType,
                 points,
                 displayOrder,
-                updatedBy: req.user.userId
+                updatedBy
             }
         );
         if (!updatedQuestion) {

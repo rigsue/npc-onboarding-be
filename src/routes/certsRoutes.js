@@ -14,8 +14,8 @@ const router = express.Router();
 
 router.post("/create-cert", verifyToken, verifyAdmin, makeCert);
 router.get("/:id", verifyToken, getCertById);
-router.get("/:certNumber", verifyCert);
-router.get("/:userProgressId", verifyToken, getCertsByUserProgress);
+router.get("/verify/:certNumber", verifyCert);
+router.get("/progress/:userProgressId", verifyToken, getCertsByUserProgress);
 router.patch("/:id/revoke", verifyToken, verifyAdmin, revokeCertificate);
 
 export default router;

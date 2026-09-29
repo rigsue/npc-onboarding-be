@@ -1,10 +1,10 @@
 import pool from "../config/db.js";
 
 export async function createNotif(
-    {title,
+    title,
     description,
     notificationType,
-    createdBy = null},
+    createdBy = null,
     connection = pool
 ) {
     const sql = `
@@ -29,7 +29,7 @@ export async function createNotif(
 }
 
 export async function findNotifById(
-    {notificationId}, connection = pool
+    notificationId, connection = pool
 ) {
     const sql = `
         SELECT *
@@ -43,7 +43,7 @@ export async function findNotifById(
 }
 
 export async function findNotifsByUser(
-    {userId}, connection = pool
+    userId, connection = pool
 ) {
     const sql = `
         SELECT
@@ -67,7 +67,7 @@ export async function findNotifsByUser(
 }
 
 export async function addNotifRecipient(
-    {notificationId, userId},
+    notificationId, userId,
     connection = pool
 ) {
     const sql = `
@@ -85,7 +85,7 @@ export async function addNotifRecipient(
 }
 
 export async function markNotifAsRead(
-    {notificationId, userId},
+    notificationId, userId,
     connection = pool
 ) {
     const sql = `

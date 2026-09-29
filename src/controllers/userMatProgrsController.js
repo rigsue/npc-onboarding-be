@@ -18,10 +18,10 @@ export async function createUserMatProgrs(req, res, next) {
             error.code = "missing_material_progress_fields";
             throw error;
         }
-        const progress = await createUserMatProg(
+        const progress = await createUserMatProg({
             userId,
             learnMatId
-        );
+        });
         return res.status(201).json({
             message: "Material progress created successfully",
             data: progress

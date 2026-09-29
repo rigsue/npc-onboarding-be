@@ -1,12 +1,12 @@
 import pool from "../config/db.js";
 
 export async function createCert(
-    {userProgressId,
+    userProgressId,
     certNumber,
     certVerification,
-    certificateFile = null,
+    certFile = null,
     tempVersion = null,
-    expiresAt = null},
+    expiresAt = null,
     connection = pool
 ) {
     const sql = `
@@ -14,7 +14,7 @@ export async function createCert(
             user_progress_id,
             cert_number,
             cert_verification,
-            certificate_file,
+            cert_file,
             temp_version,
             issued_at,
             expires_at
@@ -26,7 +26,7 @@ export async function createCert(
         userProgressId,
         certNumber,
         certVerification,
-        certificateFile,
+        certFile,
         tempVersion,
         expiresAt
     ];
@@ -36,7 +36,7 @@ export async function createCert(
 }
 
 export async function findCertById(
-    {certId}, connection = pool
+    certId, connection = pool
 ) {
     const sql = `
         SELECT *
@@ -65,7 +65,7 @@ export async function findCertByNumber(
 }
 
 export async function findCertsByUserProgress(
-    {userProgressId}, connection = pool
+    userProgressId, connection = pool
 ) {
     const sql = `
         SELECT *
@@ -80,9 +80,9 @@ export async function findCertsByUserProgress(
 }
 
 export async function revokeCert(
-    {certId,
+    certId,
     revokedBy,
-    revokedReason},
+    revokedReason,
     connection = pool
 ) {
     const sql = `

@@ -48,7 +48,6 @@ export async function findAllExamAttempts(connection = pool) {
             points_awarded,
             answered_at
         FROM exam_attempt_answers
-        WHERE exam_attempt_id = $1
         ORDER BY attempt_answer_id;
     `;
     const { rows } = await connection.query(sql);

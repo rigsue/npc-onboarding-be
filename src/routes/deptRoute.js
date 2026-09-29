@@ -5,20 +5,21 @@ import {
     getAllDepartments,
     getDepartmentById,
     updateDepartment,
+    activateDepartment,
     deactivateDepartment
 } from "../controllers/deptController.js";
 
 import { 
-    verifySuperAdmin,
-    verifyToken
+    verifySuperAdmin, verifyToken
  } from "../middlewares/auth.js";
 
  const router = Router();
 
- router.post("create-department", verifyToken, verifySuperAdmin, createDepartment);
+ router.post("/create-department", verifyToken, verifySuperAdmin, createDepartment);
  router.get("/get-departments", verifyToken, verifySuperAdmin, getAllDepartments);
- router.get("/:department_id", verifyToken, verifySuperAdmin, getDepartmentById);
- router.put("/:department_id", verifyToken, verifySuperAdmin, updateDepartment);
- router.patch("/:department_id/deactivate", verifyToken, verifySuperAdmin, deactivateDepartment);
+ router.get("/:departmentId", verifyToken, verifySuperAdmin, getDepartmentById);
+ router.put("/:departmentId", verifyToken, verifySuperAdmin, updateDepartment);
+ router.patch("/:departmentId/activate", verifyToken, verifySuperAdmin, activateDepartment);
+ router.patch("/:departmentId/deactivate", verifyToken, verifySuperAdmin, deactivateDepartment);
 
  export default router;
