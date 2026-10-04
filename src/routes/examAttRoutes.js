@@ -14,7 +14,7 @@ import { verifyToken, verifyAdmin} from "../middlewares/auth.js";
 const router = express.Router();
 
 router.post("/", verifyToken, makeExamAtt);
-router.post("/get-all-ex-att", verifyToken, getAllExamAtt);
+router.get("/get-all-ex-att", verifyToken, getAllExamAtt);
 router.get("/:id", verifyToken, getExamAttById);
 router.get("/progress/:userProgressId", verifyToken, getExamAttByUserProgress);
 router.put("/:id/result", verifyToken, verifyAdmin, updateExamAttResult);
