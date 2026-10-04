@@ -75,7 +75,7 @@ export async function createAccessToken(user) {
             });
         } 
         
-        if (req.user.roleName === "Admin") {
+        if (req.user.roleName === "Admin" || "Super admin") {
             next();
         }else {
             return res.status(403).send({
