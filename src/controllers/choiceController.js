@@ -115,12 +115,19 @@ export async function updateChoice(req, res, next) {
             displayOrder,
             req.user.userId
         );
-        if (!choice) {
-            const error = new Error("Choice not found");
-            error.status = 404;
-            error.code = "choice_not_found";
+
+        if (
+            typeof choiceText !== "string" ||
+            !choiceText.trim() ||
+            typeof isCorrect !== "boolean"
+            ) {
+        const error = new Error(
+            "Choice text and a valid isCorrect boolean are required"
+                );
+            error.status = 400;
+            error.code = "invalid_choice_fields";
             throw error;
-        }
+                }
 
         return res.status(200).json({
             message: "Choice updated successfully",

@@ -70,11 +70,11 @@ export async function getExamById(req, res, next) {
         const exam = await findExamById(examId);
 
         if(!exam) {
-            res.status(404).json({
+          return res.status(404).json({
                 message: "Exam not found 1"
             });
         }
-        res.status(200).json({
+            return res.status(200).json({
             message: "Exam retrieved successfully 2",
             data: exam
         });
@@ -107,11 +107,11 @@ export async function updateExam(req, res, next) {
             updatedBy}
         );
         if(!exam) {
-            res.status(404).json({
+            return res.status(404).json({
                 message: "Exam not found 2"
             });
         } 
-        res.status(200).json({
+            return res.status(200).json({
             message: "Exam updated successfully",
             data: exam
         });

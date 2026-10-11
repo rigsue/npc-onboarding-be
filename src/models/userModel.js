@@ -1,5 +1,6 @@
 import pool from "../config/db.js";
 
+// create user
 export async function createUser(user, connection = pool) {
     const sql = `
     INSERT INTO users (
@@ -49,6 +50,7 @@ export async function createUser(user, connection = pool) {
     return rows[0];
 }
 
+// find user by email
 export async function findUserByEmail(email, connection = pool) {
     const sql = `
     SELECT
@@ -61,6 +63,7 @@ export async function findUserByEmail(email, connection = pool) {
         u.contact_number,
         u.employee_number,
         u.position,
+        u.abou_me,
         r.role_id,
         r.role_name,
         d.department_name
@@ -81,6 +84,7 @@ export async function findUserByEmail(email, connection = pool) {
     return rows [0];
 }
 
+// find all users
 export async function findAllUsers(connection = pool) {
     const sql = `
     SELECT 
@@ -93,7 +97,8 @@ export async function findAllUsers(connection = pool) {
         d.department_name,
         u.contact_number,  
         u.employee_number,
-        u.position,      
+        u.position,   
+        u.abou_me,   
         r.role_id,
         r.role_name,
         u.created_at,
@@ -115,6 +120,7 @@ export async function findAllUsers(connection = pool) {
     return rows;
 }
 
+// find user by id
 export async function findUserById(userId, connection = pool) {
     const sql = `
     SELECT
@@ -128,6 +134,7 @@ export async function findUserById(userId, connection = pool) {
         u.contact_number,
         u.employee_number,
         u.position,
+        u.abou_me,
         u.created_at,
         u.updated_at,
         u.created_by,
@@ -145,7 +152,8 @@ export async function findUserById(userId, connection = pool) {
     return rows [0];
 }
 
-export async function updateUserById(
+// update user old model schema
+/* export async function updateUserById(
         userId,  user, connection = pool
     ) {
     const sql = `
@@ -158,9 +166,10 @@ export async function updateUserById(
         contact_number = $5,
         employee_number = $6,
         position = $7,
-        updated_by = $8,
+        abou_me = $8,
+        updated_by = $9,
         updated_at = NOW()
-    WHERE users.user_id = $9
+    WHERE users.user_id = $10
     RETURNING
         user_id,
         first_name,
@@ -170,6 +179,7 @@ export async function updateUserById(
         contact_number,
         employee_number,
         position,
+        about_me,
         created_at,
         updated_at,
         created_by,
@@ -184,6 +194,7 @@ export async function updateUserById(
         user.contactNumber,
         user.employeeNumber,
         user.position,
+        user.aboutMe,
         user.updatedBy,
         userId
     ]
@@ -192,7 +203,74 @@ export async function updateUserById(
 
     return rows [0];
 };
+ */
 
+// update user new model
+export async function updateUserById(
+  userId,
+  user,
+  connection = pool
+) {
+  const fieldMap = {
+    firstName: "first_name",
+    lastName: "last_name",
+    email: "email",
+    departmentId: "department_id",
+    contactNumber: "contact_number",
+    employeeNumber: "employee_number",
+    position: "position",
+    aboutMe: "abou_me",
+  };
+
+  const setClauses = [];
+  const values = [];
+
+  for (const [field, column] of Object.entries(fieldMap)) {
+    if (Object.hasOwn(user, field)) {
+      values.push(user[field]);
+      setClauses.push(`${column} = $${values.length}`);
+    }
+  }
+
+  if (user.updatedBy !== undefined) {
+    values.push(user.updatedBy);
+    setClauses.push(`updated_by = $${values.length}`);
+  }
+
+  if (setClauses.length === 0) {
+    return null;
+  }
+
+  setClauses.push("updated_at = NOW()");
+
+  values.push(userId);
+
+  const sql = `
+    UPDATE users
+    SET ${setClauses.join(", ")}
+    WHERE user_id = $${values.length}
+    RETURNING
+      user_id,
+      first_name,
+      last_name,
+      email,
+      department_id,
+      contact_number,
+      employee_number,
+      position,
+      abou_me,
+      created_at,
+      updated_at,
+      created_by,
+      updated_by;
+  `;
+
+  const { rows } = await connection.query(sql, values);
+
+  return rows[0];
+}
+
+// update password
 export async function updateUserPassword(
         userId, passwordHash, connection = pool
     ) {
@@ -216,6 +294,7 @@ export async function updateUserPassword(
     return rows [0];
 }
 
+// deactivate user
 export async function deactivateUserById(
         userId, updatedBy, connection = pool
     ) {
@@ -243,6 +322,7 @@ export async function deactivateUserById(
     return rows [0];
 }
 
+// activate user
 export async function activateUserById(
         userId, updatedBy, connection = pool
     ) {

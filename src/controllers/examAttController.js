@@ -45,9 +45,9 @@ export async function makeExamAtt(req, res, next) {
             throw error;
         }
 //  -   -   check user progress module  -   -
-        const userProgessList  = await findUserProgressByUser({
+        const userProgessList  = await findUserProgressByUser(
             userId
-        });
+        );
         const userProgess = userProgessList.find(
             progress =>
                 progress.learn_mod_id === exam.learn_mod_id
@@ -57,7 +57,7 @@ export async function makeExamAtt(req, res, next) {
             const error = new Error(
                 "User progress for this module not found"
             );
-            error.sta = 404;
+            error.status = 404;
             error.code = "user_progress not found";
             throw error;
         }
