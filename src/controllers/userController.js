@@ -15,8 +15,11 @@ import {
     createUserRole, updateUserRole 
     } from "../models/userRoleModel.js";
 
+    // create users
 export async function createUserControl(req, res, next) {
     const connection = await pool.connect();
+
+    let transactionStart = false;
 
     try {
         const {
@@ -40,7 +43,6 @@ export async function createUserControl(req, res, next) {
             || !roleId 
             || !departmentId
         ) {
-            connection.release();
 
             return res.status(400).json({
                 message: "Name, email, password, roles and department are required."
@@ -50,7 +52,6 @@ export async function createUserControl(req, res, next) {
         const existUser = await findUserByEmail(email, connection);
 
         if (existUser) {
-            connection.release();
 
             return res.status(409).json({
                 message: "Email already exist."
@@ -76,6 +77,7 @@ export async function createUserControl(req, res, next) {
         };
         //  -   - TRANSACTION starts here   -   -
         await connection.query("BEGIN");
+        transactionStart = true;
 
         //  -   -   Create user -   -
         const newUser = await createUser(userData, connection);
@@ -90,8 +92,7 @@ export async function createUserControl(req, res, next) {
     );
     //  -   -   commit TRANSACTION  -   -
         await connection.query("COMMIT");
-
-        connection.release();
+        transactionStart = false;
 
         return res.status(201).json({
             message: "User has been created successfully",
@@ -103,12 +104,16 @@ export async function createUserControl(req, res, next) {
         
     } catch (error) {
         //  -   -   rollback TRANSACTION    -   -
-        await connection.query("ROLLBACK");
-        connection.release();
+        if (transactionStart) {
+            await connection.query("ROLLBACK");
+        }
         next(error);
+    } finally {
+        connection.release();
     }
 }
 
+// get all users
 export async function getUsers(_req, res, next) {
     try {
         // console.log("GET USERS: controller reached");
@@ -126,6 +131,7 @@ export async function getUsers(_req, res, next) {
     
 }
 
+// get user by id
 export async function getUserById(req, res, next) {
     try {
         const { id } = req.params;
@@ -147,8 +153,11 @@ export async function getUserById(req, res, next) {
     }
 }
 
+// update user for all roles
 export async function updateUser(req, res, next) {
         const connection = await pool.connect();
+
+    let transactionStart = false;
 
     try {
         const { id } = req.params;
@@ -161,14 +170,19 @@ export async function updateUser(req, res, next) {
             contactNumber,
             employeeNumber,
             position,
+            aboutMe,
             roleId,
         } = req.body;
 
-        if (!firstName || !lastName || !email || !departmentId) {
-            return res.status(400).json({
-                message: "Name, email, department, role, position, empNUmber requireder."
-            });
-        }
+            if (
+                (firstName !== undefined && !firstName?.trim()) ||
+                (lastName !== undefined && !lastName?.trim()) ||
+                (email !== undefined && !email?.trim())
+            ) {
+                return res.status(400).json({
+                    message: "Name and email cannot be empty.",
+                });
+            }
 
         const targetUserId = Number(id);
         const loggedInUserId = Number(req.user.userId);
@@ -177,48 +191,80 @@ export async function updateUser(req, res, next) {
         const isSuperAdmin = loggedInRole === "Super admin";
         const isOwnAccount = loggedInUserId === targetUserId;
 
+        if (!isSuperAdmin) {
+            if (
+                departmentId !== undefined ||
+                roleId !== undefined ||
+                employeeNumber !== undefined ||
+                position !== undefined
+            ) {
+                return res.status(403).json({
+                    message: "Only Super admin can change department, role, employee number, and position."
+                });
+            }
+        }
+
         if(!isSuperAdmin && !isOwnAccount) {
             return res.status(403).json({
                 error: "Not authorized to change here"
             });
         }
-        await connection.query("BEGIN");
 
+        const updates = {
+            ...(firstName !== undefined && { firstName }),
+            ...(lastName !== undefined && { lastName }),
+            ...(email !== undefined && { email }),
+            ...(departmentId !== undefined && { departmentId }),
+            ...(contactNumber !== undefined && { contactNumber }),
+            ...(employeeNumber !== undefined && { employeeNumber }),
+            ...(position !== undefined && { position }),
+            ...(aboutMe !== undefined && { aboutMe }),
+            updatedBy: req.user.userId,
+        };
+
+        // Validate roleId before starting the transaction
+        if (
+            isSuperAdmin &&
+            Object.hasOwn(req.body, "roleId") &&
+            (roleId === null || roleId === undefined)
+        ) {
+            return res.status(400).json({
+                message: "roleId cannot be null."
+            });
+        }
+
+        await connection.query("BEGIN");
+        transactionStart = true;
+
+        // Update user information first
         const updatedUser = await updateUserById(
             targetUserId,
-            {
-                firstName,
-                lastName,
-                email,
-                departmentId,
-                contactNumber,
-                employeeNumber,
-                position,
-                updatedBy: req.user.userId
-            },
+            updates,
             connection
         );
 
         if (!updatedUser) {
             await connection.query("ROLLBACK");
-            connection.release();
+            transactionStart = false;
 
             return res.status(404).json({
                 message: "User was not found"
             });
         }
 
-        const updatedUserRole = await updateUserRole(
-            
-            targetUserId,
-            roleId,
-            req.user.userId,
-            connection
-        );
+        // Update role once Super admin provides roleId
+        let updatedUserRole = null;
 
+        if (isSuperAdmin && Object.hasOwn(req.body, "roleId")) {
+            updatedUserRole = await updateUserRole(
+                targetUserId,
+                roleId,
+                req.user.userId,
+                connection
+            );
+        }
         await connection.query("COMMIT");
-
-        connection.release();
+        transactionStart = false;
 
         return res.status(200).json({
             message: "User has been updated successfully",
@@ -229,14 +275,16 @@ export async function updateUser(req, res, next) {
         });
 
     } catch (error) {
-        await connection.query("ROLLBACK");
-        connection.release();
-
+        if (transactionStart) {
+            await connection.query("ROLLBACK");
+        }
         next(error);
+    } finally {
+        connection.release();
     }
-    
 }
 
+// update user password with all acounts except admin cannot edit others password
 export async function updatePassword(req, res, next) {
     try {
         const { id } = req.params;

@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.post("/create-exam", verifyToken, verifyAdmin, createExam);
 router.get("/get-exam", verifyToken, verifyAdminOrSuperadmin, getAllExams);
-router.get("/:learnModId", verifyToken, verifyAdmin, getExamByMod);
+router.get("/module/:learnModId", verifyToken, verifyAdmin, getExamByMod);
 router.get("/:examId", verifyToken, verifyAdmin, getExamById);
 router.put("/:examId", verifyToken, verifyAdmin, updateExam);
 router.patch("/:examId/stats", verifyToken, verifyAdmin, updatedExamStat);
