@@ -1,7 +1,7 @@
 export async function up(knex) {
   await knex.schema.alterTable("users", function(table) {
 
-    table.text("abou_me");
+    table.text("about_me");
   });
 }
 

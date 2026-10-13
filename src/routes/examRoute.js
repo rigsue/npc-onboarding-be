@@ -12,12 +12,18 @@ import {
 import { verifyToken, verifyAdmin, verifyAdminOrSuperadmin } from "../middlewares/auth.js";
 
 const router = express.Router();
-
+/* 
 router.post("/create-exam", verifyToken, verifyAdmin, createExam);
-router.get("/get-exam", verifyToken, verifyAdminOrSuperadmin, getAllExams);
 router.get("/module/:learnModId", verifyToken, verifyAdmin, getExamByMod);
 router.get("/:examId", verifyToken, verifyAdmin, getExamById);
 router.put("/:examId", verifyToken, verifyAdmin, updateExam);
 router.patch("/:examId/stats", verifyToken, verifyAdmin, updatedExamStat);
+ */
+router.post("/create-exam", verifyToken, verifyAdminOrSuperadmin, createExam);
+router.get("/get-exam", verifyToken, verifyAdminOrSuperadmin, getAllExams);
+router.get("/module/:learnModId", verifyToken, verifyAdminOrSuperadmin, getExamByMod);
+router.get("/:examId", verifyToken, verifyAdminOrSuperadmin, getExamById);
+router.put("/:examId", verifyToken, verifyAdminOrSuperadmin, updateExam);
+router.patch("/:examId/stats", verifyToken, verifyAdminOrSuperadmin, updatedExamStat);
 
 export default router;

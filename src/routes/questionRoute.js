@@ -9,16 +9,19 @@ import {
     updateQuesStat
 } from "../controllers/questionController.js";
 
-import { verifyToken, verifyAdmin } 
+import { verifyToken, verifyAdmin, verifyAdminOrSuperadmin } 
 from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.post("/create-question", verifyToken, verifyAdmin, makeQuestion);
+// router.post("/create-question", verifyToken, verifyAdmin, makeQuestion);
+/* router.put("/:id", verifyToken, verifyAdmin, updateQuestion);
+router.patch("/:id/status", verifyToken, verifyAdmin, updateQuesStat); */
+router.post("/create-question", verifyToken, verifyAdminOrSuperadmin, makeQuestion);
 router.get("/get-question", verifyToken, getAllQuestions);
 router.get("/exam/:examId", verifyToken, getQuesByExam);
 router.get("/:id", verifyToken, getQuesById);
-router.put("/:id", verifyToken, verifyAdmin, updateQuestion);
-router.patch("/:id/status", verifyToken, verifyAdmin, updateQuesStat);
+router.put("/:id", verifyToken, verifyAdminOrSuperadmin, updateQuestion);
+router.patch("/:id/status", verifyToken, verifyAdminOrSuperadmin, updateQuesStat);
 
 export default router;
