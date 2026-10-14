@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        const extension = path.extname(file.originalname).toLocaleLowerCase();
+        const extension = path.extname(file.originalname).toLowerCase();
 
         cb(null, `${randomUUID()}${extension}`);
     }
@@ -35,9 +35,9 @@ const upload = multer({
     },
 
     fileFilter: (req, file, cb) => {
-        const extension = path.extname(file.originalname).toLocaleLowerCase();
+        const extension = path.extname(file.originalname).toLowerCase();
 
-        if(allowedExtensions.has(extension)) {
+        if(!allowedExtensions.has(extension)) {
             return cb(new Error("This file type is not allowed"));
         }
         cb(null, true);

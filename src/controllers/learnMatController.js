@@ -26,6 +26,18 @@ export async function createMats(req, res, next) {
 
         const createdBy = req.user.userId;
 
+        const files = req.files || [];
+
+        const uploadedFiles = files.map((file) => ({
+            originalFileName: file.originalName,
+            storageKey: file.fileName,
+            mimeType: file.mimeType,
+            fileSize: file.size,
+            contentUrl: `/uploads/materiald${file.filename}`
+        }));
+
+        const firstFile = uploadedFiles[0];
+
         const material = await createLearnMat({
             learnModId,
             title,
@@ -34,11 +46,11 @@ export async function createMats(req, res, next) {
             minDurationMinutes,
             maxDurationMinutes,
             materialType,
-            originalFileName,
-            storageKey,
-            mimeType,
-            fileSize,
-            contentUrl,
+            originalFileName: firstFile.originalFileName ?? null,
+            storageKey: firstFile.storageKey ?? null,
+            mimeType: firstFile.mimeType ?? null,
+            fileSize: firstFile.fileSize ?? null,
+            contentUrl: firstFile.contentUrl ?? null,
             createdBy
         });
         res.status(201).json({
