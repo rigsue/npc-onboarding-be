@@ -1,3 +1,7 @@
+import pool from "../config/db.js";
+import { unlink } from "node:fs/promises";
+import path from "node:path";
+
 import {
     createLearnMat,
     findAllLearnMat,
@@ -8,6 +12,13 @@ import {
 } from "../models/learnMatModel.js"
 
 export async function createMats(req, res, next) {
+    const connection = await pool.connect();
+
+    const files = req.files || [];
+        
+    let transactionStart = false;
+    let transactionCommit = false;
+
     try {
         const {
             learnModId,
@@ -16,49 +27,85 @@ export async function createMats(req, res, next) {
             displayOrder,
             minDurationMinutes,
             maxDurationMinutes,
-            materialType,
-            originalFileName,
-            storageKey,
-            mimeType,
-            fileSize,
-            contentUrl
+            materialType
         } = req.body;
 
         const createdBy = req.user.userId;
 
-        const files = req.files || [];
+        if (files.length === 0) {
+            return res.status(400).json({
+                message: "Upload atleast 1 file"
+            });
+        }
 
-        const uploadedFiles = files.map((file) => ({
-            originalFileName: file.originalName,
-            storageKey: file.fileName,
-            mimeType: file.mimeType,
-            fileSize: file.size,
-            contentUrl: `/uploads/materiald${file.filename}`
-        }));
+        await connection.query("BEGIN");
+        transactionStart = true;
+        
+        const materials = [];
+        
+        for (const [index, file] of files.entries()) {
+            const originalFileName = file.originalname;
+            const storageKey = file.filename;
+            const mimeType = file.mimetype;
+            const fileSize = file.size;
 
-        const firstFile = uploadedFiles[0];
+            const contentUrl = `/uploads/materiald/${file.filename}`;
 
-        const material = await createLearnMat({
-            learnModId,
-            title,
-            description,
-            displayOrder,
-            minDurationMinutes,
-            maxDurationMinutes,
-            materialType,
-            originalFileName: firstFile.originalFileName ?? null,
-            storageKey: firstFile.storageKey ?? null,
-            mimeType: firstFile.mimeType ?? null,
-            fileSize: firstFile.fileSize ?? null,
-            contentUrl: firstFile.contentUrl ?? null,
-            createdBy
-        });
-        res.status(201).json({
-            message: "Learning material created successully",
-            data: material
+            const fileTitle = path.parse(originalFileName).name;
+
+            const material = await createLearnMat(
+                {
+                    learnModId,
+                    title: files.length === 1 ? title : `${title} - ${fileTitle}`,
+                    description,
+                    displayOrder: Number(displayOrder ?? 0) + index,
+                    minDurationMinutes,
+                    maxDurationMinutes,
+                    materialType,
+                    originalFileName,
+                    storageKey,
+                    mimeType,
+                    fileSize,
+                    contentUrl,
+                    createdBy
+                },
+                connection
+            );
+            materials.push(material);
+        }
+        await connection.query("COMMIT");
+        transactionCommit = true;
+
+        return res.status(201).json({
+            message: "Learnin materials created successfully",
+            count: materials.length,
+            data: materials
         });
     } catch (error) {
-        next(error);
+        if(transactionStart && !transactionCommit) {
+            try{
+                await tconnection.query("ROLLBACK");
+            } catch (rollbackError) {
+                console.error("Rollback for CraeteMaterial transaction failed", rollbackError);
+            }
+        }
+        if(!transactionCommit) {
+            await Promise.all(
+                files.map(async (file) => {
+                    try {
+                        await unlink(file.path);
+                    } catch (cleanupError) {
+                        if(cleanupError.comde !== "ENDENT") {
+                            console.error("Upload file cleanup failed:", cleanupError);
+                        }
+                    }
+                })
+            )
+        } return next(error);
+    } finally {
+        connection?.release();
+
+        
     }
 }
 

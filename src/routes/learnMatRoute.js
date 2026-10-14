@@ -29,8 +29,8 @@ router.post(
     upload.array("files", 20), 
     createMats
 );
-router.get("/get-materials", verifyToken, verifyAdminOrSuperadmin, getAllMat);
-router.get("/:learnModId/by-mod", verifyToken, verifyAdminOrSuperadmin, getMatByMod);
+router.get("/get-materials", verifyToken, getAllMat);
+router.get("/:learnModId/by-mod", verifyToken, getMatByMod);
 router.get("/:learnMatId", verifyToken, verifyAdminOrSuperadmin, getMatById);
 router.put("/:learnMatId", verifyToken, verifyAdminOrSuperadmin, updateMatById);
 router.patch("/:learnMatId/status", verifyToken, verifyAdminOrSuperadmin, updateMatStat);
