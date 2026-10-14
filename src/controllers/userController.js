@@ -14,12 +14,12 @@ import {
 import { 
     createUserRole, updateUserRole 
     } from "../models/userRoleModel.js";
+import { type } from "node:os";
 
     // create users
 export async function createUserControl(req, res, next) {
-    const connection = await pool.connect();
-
-    let transactionStart = false;
+    let connection;
+    let transactionActive = false;
 
     try {
         const {
@@ -48,6 +48,7 @@ export async function createUserControl(req, res, next) {
                 message: "Name, email, password, roles and department are required."
             });
         }
+        connection = await pool.connect();
 //  -   -   check email if exist    -   -
         const existUser = await findUserByEmail(email, connection);
 
@@ -77,7 +78,7 @@ export async function createUserControl(req, res, next) {
         };
         //  -   - TRANSACTION starts here   -   -
         await connection.query("BEGIN");
-        transactionStart = true;
+        transactionActive = true;
 
         //  -   -   Create user -   -
         const newUser = await createUser(userData, connection);
@@ -92,7 +93,7 @@ export async function createUserControl(req, res, next) {
     );
     //  -   -   commit TRANSACTION  -   -
         await connection.query("COMMIT");
-        transactionStart = false;
+        transactionActive = false;
 
         return res.status(201).json({
             message: "User has been created successfully",
@@ -104,12 +105,17 @@ export async function createUserControl(req, res, next) {
         
     } catch (error) {
         //  -   -   rollback TRANSACTION    -   -
-        if (transactionStart) {
-            await connection.query("ROLLBACK");
+        if (transactionActive && connection) {
+            try {
+                await connection.query("ROLLBACK");
+                transactionActive = false;
+            } catch (rollbackError) {
+                console.error("Transaction rollback failed for create user:", rollbackError);
+            }
         }
-        next(error);
+        return next(error);
     } finally {
-        connection.release();
+        connection?.release();
     }
 }
 
@@ -155,9 +161,8 @@ export async function getUserById(req, res, next) {
 
 // update user for all roles
 export async function updateUser(req, res, next) {
-        const connection = await pool.connect();
-
-    let transactionStart = false;
+    let conn;
+    let transactionActive = false;
 
     try {
         const { id } = req.params;
@@ -175,9 +180,12 @@ export async function updateUser(req, res, next) {
         } = req.body;
 
             if (
-                (firstName !== undefined && !firstName?.trim()) ||
-                (lastName !== undefined && !lastName?.trim()) ||
-                (email !== undefined && !email?.trim())
+                (firstName !== undefined && (
+                    typeof firstName !=="string" || !firstName?.trim())) ||
+                (lastName !== undefined && (
+                    typeof lastName !== "string" || !lastName?.trim())) ||
+                (email !== undefined && (
+                    typeof email!== "string" || !email?.trim()))
             ) {
                 return res.status(400).json({
                     message: "Name and email cannot be empty.",
@@ -204,11 +212,26 @@ export async function updateUser(req, res, next) {
             }
         }
 
+        // non superadmin can only update own account
         if(!isSuperAdmin && !isOwnAccount) {
             return res.status(403).json({
                 error: "Not authorized to change here"
             });
         }
+
+//  Validation - superadmin must include roles
+        if (
+            isSuperAdmin &&
+            Object.hasOwn(req.body, "roleId") &&
+            (roleId === null || roleId === undefined)
+        ) {
+            return res.status(400).json({
+                message: "roleId cannot be null."
+            });
+        }
+
+        // acquiring connection after validation
+        connection = await pool.connect();
 
         const updates = {
             ...(firstName !== undefined && { firstName }),
@@ -222,19 +245,9 @@ export async function updateUser(req, res, next) {
             updatedBy: req.user.userId,
         };
 
-        // Validate roleId before starting the transaction
-        if (
-            isSuperAdmin &&
-            Object.hasOwn(req.body, "roleId") &&
-            (roleId === null || roleId === undefined)
-        ) {
-            return res.status(400).json({
-                message: "roleId cannot be null."
-            });
-        }
-
+//  starting transaction
         await connection.query("BEGIN");
-        transactionStart = true;
+        transactionActive = true;
 
         // Update user information first
         const updatedUser = await updateUserById(
@@ -245,7 +258,7 @@ export async function updateUser(req, res, next) {
 
         if (!updatedUser) {
             await connection.query("ROLLBACK");
-            transactionStart = false;
+            transactionActive = false;
 
             return res.status(404).json({
                 message: "User was not found"
@@ -263,8 +276,9 @@ export async function updateUser(req, res, next) {
                 connection
             );
         }
+
         await connection.query("COMMIT");
-        transactionStart = false;
+        transactionActive = false;
 
         return res.status(200).json({
             message: "User has been updated successfully",
@@ -275,12 +289,17 @@ export async function updateUser(req, res, next) {
         });
 
     } catch (error) {
-        if (transactionStart) {
-            await connection.query("ROLLBACK");
+        if (transactionActive && connection) {
+            try {
+                await connection.query("ROLLBACK");
+                transactionActive = false;
+            } catch (rollbackError) {
+                console.error("transaction rollback failed for Update user:", rollbackError);
+            }
         }
-        next(error);
+        return next(error);
     } finally {
-        connection.release();
+        connection?.release();
     }
 }
 
