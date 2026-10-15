@@ -234,3 +234,14 @@ export async function updateLearnMatStat(
     ]);
     return rows[0];
 }
+
+export async function getNextDisplayOrder(connection, learnModId) {
+    const sql = `
+        SELECT COALESCE(MAX(display_order), 0) + 1
+        AS next_display_order
+        FROM learning_materials
+        WHERE learn_mod_id = $1;
+    `;
+    const { rows } = await connection.query(sql, [learnModId]);
+    return Number(rows[0].next_display_order);
+}
