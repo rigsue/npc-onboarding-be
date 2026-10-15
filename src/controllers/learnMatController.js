@@ -7,15 +7,17 @@ import {
     findAllLearnMat,
     findLearnMatById,
     findLearnMatByModId,
+    getNextDisplayOrder,
     updateLearnMatById,
-    updateLearnMatStat
+    updateLearnMatStat,
 } from "../models/learnMatModel.js"
 
 export async function createMats(req, res, next) {
-    const connection = await pool.connect();
 
     const files = req.files || [];
-        
+
+
+    let connection;
     let transactionStart = false;
     let transactionCommit = false;
 
@@ -24,7 +26,6 @@ export async function createMats(req, res, next) {
             learnModId,
             title,
             description,
-            displayOrder,
             minDurationMinutes,
             maxDurationMinutes,
             materialType
@@ -38,8 +39,77 @@ export async function createMats(req, res, next) {
             });
         }
 
+        if (!Number.isSafeInteger(Number(learnModId)) || 
+            Number(learnModId) < 1 || 
+            !title?.trim() 
+            || !materialType?.trim()
+        ) {
+            return res.status(400).json({
+                message: "Display order must be a positive integer"
+            });
+        }
+
+        const minDuration = Number(minDurationMinutes ?? 5);
+
+        const maxDuration = maxDurationMinutes === undefined ||
+            maxDurationMinutes === "" ? null : Number(maxDurationMinutes);
+
+        if (
+            !Number.isSafeInteger(minDuration) || 
+            minDuration < 1 || (maxDuration !== null && (
+                !Number.isSafeInteger(maxDuration) ||
+                maxDuration < minDuration
+            ))
+        ) {
+            return res.status(404).json({
+                message: "Invalid Material Duration"
+            });
+        }
+
+        // Display Order
+        const rawDisplayOrder = req.body.displayOrder;
+
+        const isAutoOrder = rawDisplayOrder === undefined ||
+            rawDisplayOrder === "";
+
+        const requestedOrder = isAutoOrder ? null : Number(rawDisplayOrder);
+
+        if (!isAutoOrder && (
+            !Number.isSafeInteger(requestedOrder) || requestedOrder < 1
+            )
+        ) {
+            return res.status(400).json({
+                message: "Display order must be a positive integer"
+            });
+        }
+
+        //  =   = connect to postgre    =   =
+
+        connection = await pool.connect();
+
         await connection.query("BEGIN");
         transactionStart = true;
+
+        // Lock selected learning module which serializes material creation for module
+
+        const moduleResult = await connection.query(
+            `SELECT learn_mod_id
+            FROM learning_module
+            WHERE learn_mod_id = $1
+            FOR UPDATE
+            `, [learnModId]
+        );
+
+        if (moduleResult.rowCount === 0) {
+            const error = new Error("Leaning module not found");
+            error.status = 404;
+            throw error;
+        }
+
+        // calculate next avail display order
+
+        const displayOrder = isAutoOrder
+            ? await getNextDisplayOrder(connection, learnModId) : requestedOrder;
         
         const materials = [];
         
@@ -56,11 +126,12 @@ export async function createMats(req, res, next) {
             const material = await createLearnMat(
                 {
                     learnModId,
-                    title: files.length === 1 ? title : `${title} - ${fileTitle}`,
-                    description,
-                    displayOrder: Number(displayOrder ?? 0) + index,
-                    minDurationMinutes,
-                    maxDurationMinutes,
+                    title: files.length === 1 ? title.trim() 
+                        : `${title.trim()} - ${fileTitle}`.slice(0, 100),
+                    description: description || null,
+                    displayOrder: displayOrder + index,
+                    minDurationMinutes: minDuration,
+                    maxDurationMinutes: maxDuration,
                     materialType,
                     originalFileName,
                     storageKey,
@@ -73,6 +144,7 @@ export async function createMats(req, res, next) {
             );
             materials.push(material);
         }
+
         await connection.query("COMMIT");
         transactionCommit = true;
 
@@ -84,9 +156,9 @@ export async function createMats(req, res, next) {
     } catch (error) {
         if(transactionStart && !transactionCommit) {
             try{
-                await tconnection.query("ROLLBACK");
+                await connection.query("ROLLBACK");
             } catch (rollbackError) {
-                console.error("Rollback for CraeteMaterial transaction failed", rollbackError);
+                console.error("Rollback CraeteMaterial failed", rollbackError);
             }
         }
         if(!transactionCommit) {
@@ -95,19 +167,32 @@ export async function createMats(req, res, next) {
                     try {
                         await unlink(file.path);
                     } catch (cleanupError) {
-                        if(cleanupError.comde !== "ENDENT") {
-                            console.error("Upload file cleanup failed:", cleanupError);
+                        if(cleanupError.code !== "ENDENT") {
+                            console.error("Upload cleanup failed:", cleanupError);
                         }
                     }
                 })
-            )
-        } return next(error);
+            );
+        }
+         
+        if (error.code === "23505") {
+            return res.status(409).json({
+                message: "Display order already used in selected module"
+            });
+        }
+
+        if (error.status === 404) {
+            return res.status(404).json({ message: error.message });
+        }
+        return next(error);
+
     } finally {
         connection?.release();
 
         
     }
 }
+
 
 export async function getAllMat(_req, res, next) {
     try{
@@ -234,3 +319,14 @@ export async function updateMatStat(req, res, next) {
         next(error);
     }
 }
+
+/* const rawDisplayOrder = req.body.displayOrder;
+
+const displayOrder = rawDisplayOrder === undefined || rawDisplayOrder === ""
+    ? await getNextDisplayOrder(connection, learnModId) : Number(rawDisplayOrder);
+
+    if (!Number.isSafeInteger(displayOrder) || displayOrder < 1) {
+        return res.status(400).json({
+            message: "Display order must be a positive integer"
+        })
+    } */
