@@ -1,0 +1,75 @@
+import exprs from 'express';
+import cors from 'cors';
+
+import authRoutes from "./src/routes/authRoute.js";
+import userRoutes from "./src/routes/userRoute.js";
+import roleRoutes from "./src/routes/roleRoute.js";
+import departmentRoutes from "./src/routes/deptRoute.js";
+import learnModRoutes from "./src/routes/learnModRoute.js";
+import learnMatRoutes from "./src/routes/learnMatRoute.js";
+import examRoutes from "./src/routes/examRoute.js";
+import questionRoutes from "./src/routes/questionRoute.js";
+import choiceRoutes from "./src/routes/choiceRoute.js";
+import examAttemptRoutes from "./src/routes/examAttRoutes.js";
+import examAttemptAnsRoutes from "./src/routes/examAttAnsRoute.js";
+import userProgressRoutes from "./src/routes/userProgrsRoute.js";
+import userMatProgressRoutes from "./src/routes/userMatProgrsRoute.js";
+import certificateRoutes from "./src/routes/certsRoutes.js";
+import notificationRoutes from "./src/routes/notifRoute.js";
+
+import { errorHandler } from "./src/middlewares/errorHandler.js";
+
+import path from "path";
+import { fileURLToPath } from "url";
+
+
+const app = exprs();
+const corsOPtions = {
+    origin: [
+        'http://localhost:3002',
+        'http://localhost:4002',
+        'http://localhost:5173',
+        'http://192.168.63.137:5173',
+        'http://192.168.1.180:5173',
+        'http://192.168.1.181:5173',
+        'http://192.168.1.185:5173',
+        'http://10.110.198.217:5173',
+        'http://192.168.0.52:5173',
+    ],
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+// Middleware
+app.use(cors(corsOPtions));
+app.use(exprs.json());
+app.use(exprs.urlencoded({ extended: true }));
+
+// Serve uploaded files
+app.use(
+    "/uploads",
+    exprs.static(path.resolve(process.cwd(), "uploads"))
+);
+
+// API Routes
+app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
+app.use("/role", roleRoutes);
+app.use("/department", departmentRoutes);
+app.use("/module", learnModRoutes);
+app.use("/material", learnMatRoutes);
+app.use("/exam", examRoutes);
+app.use("/question", questionRoutes);
+app.use("/choice", choiceRoutes);
+app.use("/exam-attempt", examAttemptRoutes);
+app.use("/exam-attempt-ans", examAttemptAnsRoutes);
+app.use("/user-progress", userProgressRoutes);
+app.use("/user-mat-progress", userMatProgressRoutes);
+app.use("/certificate", certificateRoutes);
+app.use("/notification", notificationRoutes);
+
+// Error Handler - keep this last
+app.use(errorHandler);
+
+// module.exports = app;
+export default app;

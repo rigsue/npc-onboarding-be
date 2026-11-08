@@ -1,0 +1,29 @@
+import { Router } from "express";
+
+import {
+    createUserControl,
+    getUsers,
+    getUserById,
+    updateUser,
+    updatePassword,
+    deactivateUser,
+    activateUser
+} from "../controllers/userController.js";
+
+import { 
+    verifyAdminOrSuperadmin,
+    verifySuperAdmin, 
+    verifyToken 
+} from "../middlewares/auth.js";
+
+const router = Router();
+
+router.post("/create-user", verifyToken, verifySuperAdmin, createUserControl);
+router.get("/get-users", verifyToken, verifyAdminOrSuperadmin, getUsers);
+router.get("/:id/get-user", verifyToken, getUserById);
+router.put("/:id/update-user", verifyToken, updateUser)
+router.patch("/:id/password", verifyToken, updatePassword);
+router.patch("/:id/deactivate", verifyToken, verifySuperAdmin, deactivateUser);
+router.patch("/:id/activate", verifyToken, verifySuperAdmin, activateUser);
+
+export default router;
