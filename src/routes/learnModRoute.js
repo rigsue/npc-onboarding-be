@@ -22,7 +22,7 @@ router.patch("/:learnModId/status", verifyToken, verifyAdmin, updateModStat);
 router.post("/create-module", verifyToken, verifyAdminOrSuperadmin, createMod);
 router.get("/get-modules", verifyToken, verifyAdminOrSuperadmin, getAllMods);
 router.get("/:learnModId", verifyToken, verifyAdminOrSuperadmin, getModsById);
-router.put("/:learnModId", verifyToken, verifyAdminOrSuperadmin, updateModule);
+router.patch("/:learnModId", verifyToken, verifyAdminOrSuperadmin, updateModule);
 router.patch("/:learnModId/status", verifyToken, verifyAdminOrSuperadmin, updateModStat);
 
 export default router;
