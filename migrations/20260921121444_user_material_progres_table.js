@@ -28,15 +28,20 @@ export async function up(knex) {
         .notNullable()
         .defaultTo("pending");
 
-    table.timestamp("started_at").nullable();
-    table.timestamp("completed_at").nullable();
-    table.timestamp("last_accessed_at").nullable();
+    table.timestamp("started_at", { useTz: true })
+        .nullable();
 
-    table.timestamp("created_at")
+    table.timestamp("completed_at", { useTz: true })
+        .nullable();
+
+    table.timestamp("last_accessed_at", { useTz: true })
+        .nullable();
+
+    table.timestamp("created_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
 
-    table.timestamp("updated_at")
+    table.timestamp("updated_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
 
@@ -46,7 +51,7 @@ export async function up(knex) {
 
     table.index(["learn_mat_id"]);
   });
-}
+};
 
 export async function down(knex) {
   await knex.schema.dropTableIfExists("user_material_progress");

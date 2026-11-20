@@ -16,14 +16,19 @@ export async function up(knex) {
         .onDelete("SET NULL");
 
     table.string("notification_type", 50).notNullable();
+
     table.string("title", 150).notNullable();
+
     table.string("description", 250).nullable();
 
-    table.timestamp("created_at")
+    table.string("dedupe_key", 150).nullable().unique();
+
+    table.timestamp("created_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now()); 
-  })
+  });
 };
+
 export async function down(knex) {
   await knex.schema.dropTableIfExists("notifications");
 };

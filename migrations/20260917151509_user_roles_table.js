@@ -19,7 +19,7 @@ export async function up(knex) {
         .references("user_id")
         .inTable("users");
 
-    table.timestamp("created_at")
+    table.timestamp("created_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
 
@@ -28,13 +28,14 @@ export async function up(knex) {
         .references("user_id")
         .inTable("users");
 
-    table.timestamp("updated_at")
+    table.timestamp("updated_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
 
     table.unique(["user_id", "role_id"]);
   });
 };
+
 export async function down(knex) {
   await knex.schema.dropTableIfExists("user_roles");
 };

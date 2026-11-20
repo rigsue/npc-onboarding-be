@@ -6,7 +6,8 @@ import {
     getMatByMod,
     getMatById,
     updateMatById,
-    updateMatStat
+    updateMatStat,
+    getMaterialsByDept
 } from "../controllers/learnMatController.js";
 
 import { verifyToken, verifyAdmin, verifyAdminOrSuperadmin } from "../middlewares/auth.js";
@@ -32,7 +33,15 @@ router.post(
 router.get("/get-materials", verifyToken, getAllMat);
 router.get("/:learnModId/by-mod", verifyToken, getMatByMod);
 router.get("/:learnMatId", verifyToken, verifyAdminOrSuperadmin, getMatById);
-router.put("/:learnMatId", verifyToken, verifyAdminOrSuperadmin, updateMatById);
+router.get("/get-materials/department", verifyToken, verifyAdmin, getMaterialsByDept);
+
+router.put(
+    "/:learnMatId", 
+    verifyToken, 
+    verifyAdminOrSuperadmin, 
+    upload.array("files", 1), 
+    updateMatById
+);
 router.patch("/:learnMatId/status", verifyToken, verifyAdminOrSuperadmin, updateMatStat);
 
 export default router;

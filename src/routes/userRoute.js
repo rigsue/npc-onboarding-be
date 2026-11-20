@@ -11,6 +11,7 @@ import {
 } from "../controllers/userController.js";
 
 import { 
+    verifyAdminOrSuperadmin,
     verifySuperAdmin, 
     verifyToken 
 } from "../middlewares/auth.js";
@@ -18,7 +19,7 @@ import {
 const router = Router();
 
 router.post("/create-user", verifyToken, verifySuperAdmin, createUserControl);
-router.get("/get-users", verifyToken, verifySuperAdmin, getUsers);
+router.get("/get-users", verifyToken, verifyAdminOrSuperadmin, getUsers);
 router.get("/:id/get-user", verifyToken, getUserById);
 router.put("/:id/update-user", verifyToken, updateUser)
 router.patch("/:id/password", verifyToken, updatePassword);

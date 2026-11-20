@@ -15,6 +15,15 @@ export async function up(knex) {
       .references("user_id")
       .inTable("users")
       .onDelete("CASCADE");
+    
+    table.string("email_status", 20)
+      .nullable()
+      .defaultTo("pending");
+
+    table.timestamp("email_sent_at", { useTz: true })
+      .nullable();
+
+    table.text("email_error").nullable();
 
     table
       .boolean("is_read")
@@ -22,25 +31,21 @@ export async function up(knex) {
       .defaultTo(false);
 
     table
-      .timestamp("read_at")
+      .timestamp("read_at", { useTz: true })
       .nullable();
 
     table
-      .timestamp("received_at")
+      .timestamp("received_at", { useTz: true })
       .notNullable()
       .defaultTo(knex.fn.now());
 
     table.unique([
-      "notification_id",
-      "user_id",
+      "notification_id", "user_id",
     ]);
 
-    table.index([
-      "user_id",
-      "is_read",
-    ]);
+    table.index(["user_id", "is_read"]);
   });
-}
+};
 
 export async function down(knex) {
   await knex.schema.dropTableIfExists("notification_recipients");

@@ -120,6 +120,7 @@ export async function findLearnMatByModId(
         INNER JOIN learning_module mod
             ON lm.learn_mod_id = mod.learn_mod_id
         WHERE lm.learn_mod_id = $1
+            AND lm.is_active = TRUE
         ORDER BY display_order, learn_mat_id;
     `;
     const { rows } = await connection.query(sql, [learnModId]);
@@ -127,7 +128,8 @@ export async function findLearnMatByModId(
 }
 
 export async function findLearnMatById(
-    learnMatId, connection = pool) {
+    learnMatId, connection = pool
+) {
     const sql = `
         SELECT
             lm.learn_mat_id,
@@ -156,6 +158,31 @@ export async function findLearnMatById(
     `;
     const { rows } = await connection.query(sql, [learnMatId]);
     return rows[0];
+}
+
+export async function findMaterialsByDepartment(
+    departmentId, connection = pool
+) {
+    const sql = `
+        SELECT
+            lm.learn_mat_id,
+            lm.learn_mod_id,
+            mod.title AS module_title,
+            lm.title,
+            lm.description,
+            lm.material_type,
+            lm.original_file_name,
+            lm.display_order,
+            lm.is_active,
+            lm.created_at
+        FROM learning_materials lm
+        INNER JOIN learning_module mod
+            ON lm.learn_mod_id = mod.learn_mod_id
+        WHERE mod.department_id = $1
+        ORDER BY mod.title ASC, lm.display_order ASC;            
+    `;
+    const { rows } = await connection.query(sql, [departmentId]);
+    return rows;
 }
 
 export async function updateLearnMatById(
@@ -217,7 +244,7 @@ export async function updateLearnMatById(
 }
 
 export async function updateLearnMatStat(
-    learnMatId, isActive, updatedBy, connection = pool
+    {learnMatId, isActive, updatedBy}, connection = pool
 ) {
     const sql = `
         UPDATE learning_materials

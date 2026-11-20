@@ -145,7 +145,8 @@ export async function updateExamAttStat(
     const sql = `
         UPDATE exam_attempts
         SET
-            status = $1
+            status = $1,
+            completed_at = NOw()
         WHERE exam_attempt_id = $2
         RETURNING *;
     `;
@@ -154,5 +155,30 @@ export async function updateExamAttStat(
         sql,
         [status, examAttemptId]
     );
+    return rows[0];
+}
+
+
+export async function closeExamAtt({
+    examAttemptId
+}, connection = pool) {
+    const sql = `
+        UPDATE exam_attempts
+        SET
+            status = $1,
+            completed_at = NOW()
+        WHERE exam_attempt_id = $2
+          AND status = $3
+        RETURNING *;
+    `;
+
+    const values = [
+        "failed",
+        examAttemptId,
+        "in_progress"
+    ];
+
+    const { rows } = await connection.query(sql, values);
+
     return rows[0];
 }

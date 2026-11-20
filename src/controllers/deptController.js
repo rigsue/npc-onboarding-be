@@ -7,6 +7,8 @@ import {
     deactivateDepartmentById
 } from "../models/deptModel.js";
 
+import { findUserByDeptId } from "../models/userModel.js";
+
 export async function createDepartment(req, res, next) {
     try {
         const {
@@ -56,6 +58,16 @@ export async function getDepartmentById(req, res, next) {
     try{
         const { departmentId } = req.params;
 
+        const { roleName, departmentId: userDepartmentId } = req.user;
+
+        if (roleName === "Admin" && 
+            Number(departmentId) !== Number(userDepartmentId)
+        ) {
+            return res.status(403).json({
+                message: "Can only access ones department"
+            });
+        }
+
         const department = await findDepartmentById(departmentId);
 
         if(!department) {
@@ -71,6 +83,39 @@ export async function getDepartmentById(req, res, next) {
         });
     } catch (error) {
         next(error);
+    }
+}
+
+// Get all department users
+export async function getDeptUsers(req, res, next) {
+    try {
+        const { departmentId } = req.params;
+
+        const id = Number(departmentId);
+        if (!Number.isInteger(id) || id <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid deptartment ID"
+            });
+        }
+
+        const department = await findDepartmentById(departmentId);
+
+        if (!department) {
+            return res.status(404).json({
+                success: false,
+                message: "Department not found"
+            });
+        }
+
+        const users = await findUserByDeptId(departmentId);
+
+        return res.status(200).json({
+            success: true,
+            data: users
+        });
+    } catch (error) {
+        next (error);
     }
 }
 

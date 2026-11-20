@@ -7,6 +7,7 @@ import {
     findAllLearnMat,
     findLearnMatById,
     findLearnMatByModId,
+    findMaterialsByDepartment,
     getNextDisplayOrder,
     updateLearnMatById,
     updateLearnMatStat,
@@ -15,7 +16,6 @@ import {
 export async function createMats(req, res, next) {
 
     const files = req.files || [];
-
 
     let connection;
     let transactionStart = false;
@@ -119,7 +119,7 @@ export async function createMats(req, res, next) {
             const mimeType = file.mimetype;
             const fileSize = file.size;
 
-            const contentUrl = `/uploads/materiald/${file.filename}`;
+            const contentUrl = `/uploads/materialsd/${file.filename}`;
 
             const fileTitle = path.parse(originalFileName).name;
 
@@ -167,7 +167,7 @@ export async function createMats(req, res, next) {
                     try {
                         await unlink(file.path);
                     } catch (cleanupError) {
-                        if(cleanupError.code !== "ENDENT") {
+                        if(cleanupError.code !== "ENOENT") {
                             console.error("Upload cleanup failed:", cleanupError);
                         }
                     }
@@ -192,7 +192,6 @@ export async function createMats(req, res, next) {
         
     }
 }
-
 
 export async function getAllMat(_req, res, next) {
     try{
@@ -243,68 +242,129 @@ export async function getMatById(req, res, next) {
     }
 }
 
+export async function getMaterialsByDept(req, res, next) {
+    try {
+        const departmentId = req.user.departmentId;
+        const materials = await findMaterialsByDepartment(departmentId);
+
+        return res.status(200).json({
+            message: "Department materials retrieved successfully",
+            data: materials
+        });
+    } catch (error) {
+        next (error);
+    }
+}
+
 export async function updateMatById(req, res, next) {
+    const files = req.files || [];
+    const newFile = files[0];
+
     try {
         const { learnMatId } = req.params;
-        const  {
-                learnModId,
-                title,
-                description,
-                displayOrder,
-                minDurationMinutes,
-                maxDurationMinutes,
-                materialType,
-                originalFileName,
-                storageKey,
-                mimeType,
-                fileSize,
-                contentUrl
+
+        const existing = await findLearnMatById(learnMatId);
+
+        if (!existing) {
+            if (newFile) await unlink(newFile.path).catch(() => {});
+            return res.status(404).json({
+                message: "Learning material not found"
+            });
+        }
+
+        const {
+            learnModId,
+            title,
+            description,
+            displayOrder,
+            minDurationMinutes,
+            maxDurationMinutes,
+            materialType
         } = req.body;
+
         const updatedBy = req.user.userId;
 
         const material = await updateLearnMatById(
             learnMatId,
             {
-                learnModId,
+                learnModId: Number(learnModId),
                 title,
                 description,
-                displayOrder,
-                minDurationMinutes,
-                maxDurationMinutes,
+                displayOrder: Number(displayOrder),
+                minDurationMinutes: Number(minDurationMinutes),
+                maxDurationMinutes:
+                    maxDurationMinutes === "" ||
+                    maxDurationMinutes === undefined
+                        ? null
+                        : Number(maxDurationMinutes),
                 materialType,
-                originalFileName,
-                storageKey,
-                mimeType,
-                fileSize,
-                contentUrl,
+
+                originalFileName: newFile
+                    ? newFile.originalname
+                    : existing.original_file_name,
+
+                storageKey: newFile
+                    ? newFile.filename
+                    : existing.storage_key,
+
+                mimeType: newFile
+                    ? newFile.mimetype
+                    : existing.mime_type,
+
+                fileSize: newFile
+                    ? newFile.size
+                    : existing.file_size,
+
+                contentUrl: newFile
+                    ? `/uploads/materialsd/${newFile.filename}`
+                    : existing.content_url,
+
                 updatedBy
             }
         );
-        if(!material) {
-            return res.status(404).json({
-                message: "Learning material not found 2"
+
+        // Remove the old physical file only after the DB update succeeds.
+        if (newFile && existing.storage_key) {
+            const oldPath = path.resolve(
+                process.cwd(),
+                "uploads",
+                "materialsd",
+                existing.storage_key
+            );
+
+            await unlink(oldPath).catch((error) => {
+                if (error.code !== "ENOENT") {
+                    console.error("Old material file cleanup failed:", error);
+                }
             });
         }
 
-            res.status(200).json({
-                message: "Learning materials updated successfully",
-                data: material
-            });
+        return res.status(200).json({
+            message: "Learning material updated successfully",
+            data: material
+        });
     } catch (error) {
-        next(error);
+        if (newFile) {
+            await unlink(newFile.path).catch((cleanupError) => {
+                if (cleanupError.code !== "ENOENT") {
+                    console.error("New material file cleanup failed:", cleanupError);
+                }
+            });
+        }
+
+        return next(error);
     }
 }
+
 
 export async function updateMatStat(req, res, next) {
     try{
         const { learnMatId } = req.params;
-
         const { isActive } = req.body;
-
         const updatedBy = req.user.userId;
 
         const material = await updateLearnMatStat(
-            learnMatId, isActive, updatedBy
+             {learnMatId, isActive, updatedBy}
         );
         if(!material) {
             return res.status(404).json({

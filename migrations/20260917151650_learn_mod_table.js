@@ -34,7 +34,7 @@ export async function up(knex) {
         .inTable("users")
         .onDelete("RESTRICT");
 
-    table.timestamp("created_at")
+    table.timestamp("created_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
 
@@ -44,11 +44,12 @@ export async function up(knex) {
         .inTable("users")
         .onDelete("SET NULL");
         
-    table.timestamp("updated_at")
+    table.timestamp("updated_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
   });
-}
+};
+
 export async function down(knex) {
   await knex.schema.dropTableIfExists("learning_module");
 };

@@ -14,7 +14,8 @@ import {
 import { 
     createUserRole, updateUserRole 
     } from "../models/userRoleModel.js";
-import { type } from "node:os";
+// import { type } from "node:fs";
+import { sendemail } from "../services/mailService.js";
 
     // create users
 export async function createUserControl(req, res, next) {
@@ -48,16 +49,6 @@ export async function createUserControl(req, res, next) {
                 message: "Name, email, password, roles and department are required."
             });
         }
-        connection = await pool.connect();
-//  -   -   check email if exist    -   -
-        const existUser = await findUserByEmail(email, connection);
-
-        if (existUser) {
-
-            return res.status(409).json({
-                message: "Email already exist."
-            });
-        }
 
 //  -   -   password hash here before data passed to createUser()   -   -
         const passwordHash = await bcrypt.hash(password, 10);
@@ -76,6 +67,18 @@ export async function createUserControl(req, res, next) {
             createdBy: req.user?.userId || null,
             updatedBy: req.user?.userId || null
         };
+        
+        connection = await pool.connect();
+//  -   -   check email if exist    -   -
+        const existUser = await findUserByEmail(email, connection);
+
+        if (existUser) {
+
+            return res.status(409).json({
+                message: "Email already exist."
+            });
+        }
+
         //  -   - TRANSACTION starts here   -   -
         await connection.query("BEGIN");
         transactionActive = true;
@@ -95,14 +98,50 @@ export async function createUserControl(req, res, next) {
         await connection.query("COMMIT");
         transactionActive = false;
 
+        //  -   -   Send welcome email after successful registration
+        let emailSent = false;
+
+        try {
+            
+            const emailSubject = "NPC LMS - Your Account Has Been Created";
+
+            const emailBody = `
+                Dear ${firstName} ${lastName},
+
+                Welcome to Netrust Philippines Corporation!
+
+                Your Onboarding account has been successfully created.
+
+                Account Information:
+
+                Email: ${email}
+                Temporary Password: ${password}
+
+                You can access the LMS using the following link:
+
+                https://your-lms-domain.com
+
+                Please change your temporary password upon your first login.
+
+                Regards,
+                People and Culture
+            `;
+        await sendemail(email, emailSubject, emailBody);
+
+        emailSent = true;
+        } catch (emailError) {
+            console.error("User registered but email delivery failed", emailError);
+        }
+        // Return response
         return res.status(201).json({
             message: "User has been created successfully",
-            data:{
+            emailSent,
+            data: {
                 user: newUser,
                 role: newUserRole
             }
         });
-        
+
     } catch (error) {
         //  -   -   rollback TRANSACTION    -   -
         if (transactionActive && connection) {
@@ -161,7 +200,7 @@ export async function getUserById(req, res, next) {
 
 // update user for all roles
 export async function updateUser(req, res, next) {
-    let conn;
+    let connection;
     let transactionActive = false;
 
     try {

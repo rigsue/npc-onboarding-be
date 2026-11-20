@@ -3,7 +3,8 @@ import {
     findNotifById,
     findNotifsByUser,
     addNotifRecipient,
-    markNotifAsRead
+    markNotifAsRead,
+    notifUnreadCount
 } from "../models/notifModel.js";
 
 export async function makeNotif(req, res, next) {
@@ -119,5 +120,19 @@ export async function markNotifyAsRead(req, res, next) {
         });
     } catch (err) {
         next(err);
+    }
+}
+
+export async function getNotifUnreadCount(req, res, next) {
+    try {
+        const count = await notifUnreadCount(
+            req.user.userId
+        );
+        return res.status(200).json({
+            message: "Unread count retrieved successfully",
+            data: count
+        });
+    } catch (err) {
+        next (err);
     }
 }
