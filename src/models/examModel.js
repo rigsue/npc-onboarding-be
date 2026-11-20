@@ -81,7 +81,7 @@ export async function findExambyModId(
         ORDER BY exam_id;
     `;
     const { rows } = await connection.query (sql, [learnModId]);
-    return rows[0];
+    return rows;
 }
 
 export async function findExamById(examId, connection = pool) {

@@ -105,7 +105,7 @@ export async function findExamAttAnsByAtt(
 export async function updateExamAttAns({
     attemptAnswerId,
     choiceId = null,
-    answerYext = null,
+    answerText = null,
     isCorrect = null,
     pointsAwarded = null
 },
@@ -123,7 +123,7 @@ export async function updateExamAttAns({
     `;
     const values = [
         choiceId,
-        answerYext,
+        answerText,
         isCorrect,
         pointsAwarded,
         attemptAnswerId

@@ -20,9 +20,9 @@ router.put("/:examId", verifyToken, verifyAdmin, updateExam);
 router.patch("/:examId/stats", verifyToken, verifyAdmin, updatedExamStat);
  */
 router.post("/create-exam", verifyToken, verifyAdminOrSuperadmin, createExam);
-router.get("/get-exam", verifyToken, verifyAdminOrSuperadmin, getAllExams);
-router.get("/module/:learnModId", verifyToken, verifyAdminOrSuperadmin, getExamByMod);
-router.get("/:examId", verifyToken, verifyAdminOrSuperadmin, getExamById);
+router.get("/get-exams", verifyToken, getAllExams);
+router.get("/module/:learnModId", verifyToken, getExamByMod);
+router.get("/:examId/get-exam", verifyToken, getExamById);
 router.put("/:examId", verifyToken, verifyAdminOrSuperadmin, updateExam);
 router.patch("/:examId/stats", verifyToken, verifyAdminOrSuperadmin, updatedExamStat);
 

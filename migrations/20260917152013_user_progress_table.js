@@ -28,20 +28,27 @@ export async function up(knex) {
     table.string("status", 20)
         .notNullable()
         .defaultTo("pending");
+
+    table.timestamp("due_at", { useTz: true })
+        .nullable();
+
+    table.integer("expected_duration_minutes")
+        .nullable();
     
-    table.timestamp("started_at")
+    table.timestamp("started_at", { useTz: true })
         .nullable();
 
-    table.timestamp("completed_at")
+    table.timestamp("completed_at", { useTz: true })
         .nullable();
 
-    table.timestamp("updated_at")
+    table.timestamp("updated_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
 
     table.unique(["user_id", "learn_mod_id"]);
   });
-}
+};
+
 export async function down(knex) {
   await knex.schema.dropTableIfExists("user_progress");
 };

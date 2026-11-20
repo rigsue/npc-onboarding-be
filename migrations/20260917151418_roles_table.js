@@ -6,15 +6,16 @@ export async function up(knex) {
         .notNullable()
         .unique();
 
-    table.timestamp("created_at")
+    table.timestamp("created_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
             
-    table.timestamp("updated_at")
+    table.timestamp("updated_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
   });
 };
+
 export async function down(knex) {
   await knex.schema.dropTableIfExists("roles");
 };

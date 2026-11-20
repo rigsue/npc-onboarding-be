@@ -1,7 +1,15 @@
-// import {jwt} from "jsonwebtoken"
+import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { findUserForLogin } from "../models/authModel.js";
-import { createAccessToken } from "../middlewares/auth.js";
+import { createUserSession } from "../models/userSessionModel.js";
+
+import { 
+    generateRefreshToken,
+    hashRefreshToken,
+    generateAccessToken, 
+    getRefreshExpiry,
+    setRefreshCookie
+} from "../utils/tokenUtils.js";
 
 export async function login(req, res, next) {
     try {
@@ -55,34 +63,52 @@ export async function login(req, res, next) {
                 error.code = "invalid_credentials";
 
                 throw error;
-            }    
+            }
+        const sessionId = crypto.randomUUID();
+        
+        const refreshToken = generateRefreshToken();
+        
+        const refreshTokenHash = hashRefreshToken(refreshToken);
 
-//  -   -   Create JWT  -   -   
-            const  token = await createAccessToken(user);
+        const expiresAt = getRefreshExpiry();
+
+        await createUserSession(
+            sessionId,
+            user.user_id,
+            refreshTokenHash,
+            req.headers["user-agent"] || null,
+            req.ip,
+            expiresAt
+        );
+        const accessToken = generateAccessToken(
+            user, sessionId
+        );
+        setRefreshCookie(res, refreshToken);
 
 //  -   -   if ok   -   -
-            return res.status(200).json({
-                message: "Login successful", 
-                
-                user: {
-                    userId: user.user_id,
-                    firstName: user.first_name,
-                    lastName: user.last_name,
-                    email: user.email,
-                    roleName: user.role_name,
-                    isActive: user.is_active,
-                    position: user.position,
-                    employeeNumber: user.employee_number,
-                    contactNumber: user.contact_number,
-                    departmentName: user.department_name,
-                },
-                token: token
-            });
+        return res.status(200).json({
+            message: "Login successful", 
+            
+            user: {
+                userId: user.user_id,
+                sessionId: sessionId,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                email: user.email,
+                roleName: user.role_name,
+                isActive: user.is_active,
+                position: user.position,
+                employeeNumber: user.employee_number,
+                contactNumber: user.contact_number,
+                departmentName: user.department_name,
+                aboutMe: user.about_me,
+            },
+            token: accessToken
+        });
 
-        } catch (err) {
-            next(err);
-    }
-}
+    } catch (err) {
+        next(err);
+}}
 
 export async function logout(_req, res, next) {
    try { 

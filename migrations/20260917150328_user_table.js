@@ -13,13 +13,15 @@ export async function up(knex) {
     table.string("contact_number", 20).nullable();
     table.string("position", 150).notNullable();
 
+    table.text("about_me").nullable();
+
     table.string("password_hash", 255).notNullable();
 
     table.boolean("is_active")
         .notNullable()
         .defaultTo(true);
 
-    table.timestamp("created_at")
+    table.timestamp("created_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
 
@@ -29,7 +31,7 @@ export async function up(knex) {
         .inTable("users")
         .onDelete("SET NULL");
 
-    table.timestamp("updated_at")
+    table.timestamp("updated_at", { useTz: true })
         .nullable()
         .defaultTo(knex.fn.now());
 

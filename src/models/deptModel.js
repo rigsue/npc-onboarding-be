@@ -82,10 +82,9 @@ export async function updateDepartmentById(
     SET
         department_name = $1,
         description = $2,
-        is_active = $3,
-        updated_by = $4,
+        updated_by = $3,
         updated_at = NOW()
-    WHERE department_id = $5
+    WHERE department_id = $4
     RETURNING
         department_id,
         department_name,
@@ -99,7 +98,6 @@ export async function updateDepartmentById(
     const values = [
         department.departmentName,
         department.description,
-        department.isActive,
         department.updatedBy,
         departmentId
     ];

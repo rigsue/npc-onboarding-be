@@ -134,7 +134,7 @@ progress of Local Users.
 * **Examination Results:** Allow Admin Users to review examination results and completion status.
 * **Certificates:** Allow Admin Users to create and edit their certificates once their assigned
 module is completed.
-* **Notifications and Announcements:** Allow Admin Users to provide relevant notifications 
+* **Notifications:** Allow Admin Users to provide relevant notifications 
 or updates to Local Users within their authorized scope.
 * **Profile Management:** Allow Admin Users to manage their own profile information.
 * **Logout:** Allow Admin Users to securely terminate their active session.
@@ -157,7 +157,7 @@ and examination questions.
 progress across users and modules.
 * **Results Monitoring:** Allow Super Admins to view examination results, completion rates, 
 and onboarding status.
-* **Notifications and Announcements:** Allow Super Admins to publish notifications, 
+* **Notifications:** Allow Super Admins to publish notifications, 
 HR announcements, and administrative updates to Local Users and Admin Users.
 * **System Management:** Provide access to administrative functions required for maintaining 
 the overall onboarding platform.

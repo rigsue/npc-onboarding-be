@@ -63,7 +63,7 @@ export async function findUserByEmail(email, connection = pool) {
         u.contact_number,
         u.employee_number,
         u.position,
-        u.abou_me,
+        u.about_me,
         r.role_id,
         r.role_name,
         d.department_name
@@ -98,7 +98,7 @@ export async function findAllUsers(connection = pool) {
         u.contact_number,  
         u.employee_number,
         u.position,   
-        u.abou_me,   
+        u.about_me,   
         r.role_id,
         r.role_name,
         u.created_at,
@@ -134,7 +134,7 @@ export async function findUserById(userId, connection = pool) {
         u.contact_number,
         u.employee_number,
         u.position,
-        u.abou_me,
+        u.about_me,
         u.created_at,
         u.updated_at,
         u.created_by,
@@ -152,58 +152,37 @@ export async function findUserById(userId, connection = pool) {
     return rows [0];
 }
 
-// update user old model schema
-/* export async function updateUserById(
-        userId,  user, connection = pool
-    ) {
+export async function findUserByDeptId(departmentId, connection = pool) {
     const sql = `
-    UPDATE users
-    SET        
-        first_name = $1,
-        last_name = $2,
-        email = $3,
-        department_id = $4,
-        contact_number = $5,
-        employee_number = $6,
-        position = $7,
-        abou_me = $8,
-        updated_by = $9,
-        updated_at = NOW()
-    WHERE users.user_id = $10
-    RETURNING
-        user_id,
-        first_name,
-        last_name,
-        email,
-        department_id,
-        contact_number,
-        employee_number,
-        position,
-        about_me,
-        created_at,
-        updated_at,
-        created_by,
-        updated_by;
+        SELECT
+            u.user_id,
+            u.first_name,
+            u.last_name,
+            u.email,
+            u.is_active,
+            u.department_id,
+            d.department_name,
+            u.contact_number,
+            u.employee_number,
+            u.position,
+            ur.role_id,
+            r.role_name,
+            u.created_at,
+            u.updated_at
+        FROM users u
+        INNER JOIN departments d
+            ON u.department_id = d.department_id
+        INNER JOIN user_roles ur
+            ON u.user_id = ur.user_id
+        INNER JOIN roles r
+            ON ur.role_id= r.role_id
+        WHERE u.department_id = $1
+        ORDER BY u.user_id;
     `;
-
-    const values = [
-        user.firstName,
-        user.lastName,
-        user.email,
-        user.departmentId,
-        user.contactNumber,
-        user.employeeNumber,
-        user.position,
-        user.aboutMe,
-        user.updatedBy,
-        userId
-    ]
-
+    const values = [departmentId];
     const { rows } = await connection.query(sql, values);
-
-    return rows [0];
-};
- */
+    return rows;
+}
 
 // update user new model
 export async function updateUserById(
@@ -219,7 +198,7 @@ export async function updateUserById(
     contactNumber: "contact_number",
     employeeNumber: "employee_number",
     position: "position",
-    aboutMe: "abou_me",
+    aboutMe: "about_me",
   };
 
   const setClauses = [];
@@ -258,7 +237,7 @@ export async function updateUserById(
       contact_number,
       employee_number,
       position,
-      abou_me,
+      about_me,
       created_at,
       updated_at,
       created_by,

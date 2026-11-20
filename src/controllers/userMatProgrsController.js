@@ -35,7 +35,9 @@ export async function getUserMatProgById(req, res, next) {
     try {
         const { id } = req.params;
 
-        const progress = await findUserMatProgById(id);
+        const progress = await findUserMatProgById({
+            userMatProgressId: id
+    });
 
         if (!progress) {
             const error = new Error(
@@ -58,7 +60,9 @@ export async function getUserMatProgByUser(req, res, next) {
     try {
         const { userId } = req.params;
 
-        const progress = await findUserMatProgByUser(userId);
+        const progress = await findUserMatProgByUser({
+            userId
+        });
 
         return res.status(200).json({
             message: "Material progress retrieved successfully",
@@ -74,10 +78,10 @@ export async function getUserMatProg(req, res, next) {
     try {
         const { userId, learnMatId } = req.params;
 
-        const progress = await findUserMatProg(
+        const progress = await findUserMatProg({
             userId,
             learnMatId
-        );
+        });
         if (!progress) {
             const error = new Error(
                 "Material progress not found"
@@ -88,6 +92,21 @@ export async function getUserMatProg(req, res, next) {
         }
         return res.status(200).json({
             message: "Material progress retrieved successfully",
+            data: progress
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+export async function getMyMaterialProgress(req, res, next) {
+    try {
+        const userId = req.user.userId;
+
+        const progress = await findUserMatProgByUser({ userId });
+
+        return res.status(200).json({
+            message: "My material progress retrieved successfully",
             data: progress
         });
     } catch (err) {
@@ -116,12 +135,12 @@ export async function updateUserMatProgrs(req, res, next) {
             error.code = "missing_material_progress_fields";
             throw error;
         }
-        const progress = await updateUserMatProg(
-            id,
+        const progress = await updateUserMatProg({
+            userMaterialProgressId: id,
             progressPercentage,
             timeSpentMinutes,
             status
-        );
+        });
         if (!progress) {
             const error = new Error(
                 "Material progress not found"

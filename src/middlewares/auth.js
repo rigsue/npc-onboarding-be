@@ -1,12 +1,81 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
+import { findActiveUserSession } from "../models/userSessionModel.js";
+
 dotenv.config();
 
-const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
+const JWT_SECRET = process.env.JWT_SECRET_KEY
+
+//  -   -   Verify access token + Session   -   -
+export async function verifyToken(req, res, next) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({
+            auth: "Failed",
+            message: "No valid auth header provided"
+        });
+    }
+    const token = authHeader.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({
+            auth: "failed",
+            message: "No token Provided"
+        });
+    }
+    try {
+        const decodedToken = jwt.verify(
+            token, JWT_SECRET
+        );
+
+        //  Require session id
+        if (!decodedToken.sessionId) {
+            return res.status(401).json({
+                auth: "failed",
+                message: "Invalid session, login again"
+            });
+        }
+
+        // verify database session 
+        const session = await findActiveUserSession(
+            decodedToken.sessionId
+        );
+        if (
+            !session ||
+            String(session.user_id) !== String(decodedToken.userId)
+        ) {
+            return res.status(401).json({
+                auth: "Failed",
+                message: "session expired / revoked"
+            });
+        }
+        // attached decoded info 
+        req.user = decodedToken;
+        
+        return next();
+    } catch (err) {
+        if (
+            err.name === "TokenExpiredError" ||
+            err.name === "JsonWebTokenError"
+        ) {
+            return res.status(401).json({
+                auth: "Failed",
+                message: "Invalid / expired token"
+            });
+        }
+        console.error("Authentication error:", err);
+
+        return res.status(500).json({
+            auth: "Failed",
+            message: "Authentication verification failed"
+        });
+    }
+}
 
 //  -   -   create access token -   -
-export async function createAccessToken(user) {
+/* export function createAccessToken(user) {
     const data = {
         userId: user.user_id,
         email: user.email,
@@ -16,7 +85,7 @@ export async function createAccessToken(user) {
         position: user.position,
         employeeNumber: user.employee_number
     };
-    return jwt.sign(data, JWT_SECRET_KEY, {
+    return jwt.sign(data, JWT_SECRET, {
         expiresIn: "1h"
     });
 }
@@ -51,7 +120,7 @@ export async function createAccessToken(user) {
 
         try {
             const decodedToken = jwt.verify(
-                token, JWT_SECRET_KEY
+                token, JWT_SECRET
             );
 
 //  -   -   Attache decoded user info to req object -   -
@@ -64,10 +133,10 @@ export async function createAccessToken(user) {
                 message: "Invalide/Expired Token"
             });
         }
-    }
+    } */
 
 //  -   -   verify admin    -   -
-    export async function verifyAdmin(req, res, next) {
+    export function verifyAdmin(req, res, next) {
         if(!req.user) {
             return res.status(401).json({
                 auth: "Failed",
@@ -75,35 +144,37 @@ export async function createAccessToken(user) {
             });
         } 
         
-        if (req.user.roleName === "Admin" || "Super admin") {
-            next();
-        }else {
-            return res.status(403).send({
-                auth: "Failed",
-                message: "Action Forbidden. Not an Admin Account"
-            });
-        }
+        if (
+            req.user.roleName === "Admin" || 
+            req.user.roleName === "Super admin"
+        ) {
+            return next();
+        } 
+        return res.status(403).send({
+            auth: "Failed",
+            message: "Action Forbidden. Not an Admin Account"
+        });
     }
 //  -   -   verify super admin    -   -
-    export async function verifySuperAdmin(req, res, next) {
+    export function verifySuperAdmin(req, res, next) {
         if(!req.user) {
-            return res.status(401).json({
+            return res.status(403).json({
                 auth: "Failed",
                 message: "Authentication required"
-            })
+            });
         }
         
         if (req.user.roleName === "Super admin") {
-            next();
+            return next();
             
-        } else {
-            return res.status(403).send({
-                auth: "Failed",
-                message: "Action Forbidden. Not a Super Admin Accouuunt"
-            });
-        }
+        } 
+        return res.status(403).send({
+            auth: "Failed",
+            message: "Action Forbidden. Not a Super Admin Accouuunt"
+        });
     }
 
+    // Verify admin or superadmin
     export async function verifyAdminOrSuperadmin(req, res, next) {
         if(!req.user) {
             return res.status(401).json({

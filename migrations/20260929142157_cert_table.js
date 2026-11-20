@@ -17,11 +17,12 @@ export async function up(knex) {
         .notNullable()
         .unique();
 
-    table.timestamp("issued_at")
+    table.timestamp("issued_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
 
-    table.timestamp("expires_at").nullable();
+    table.timestamp("expires_at", { useTz: true })
+        .nullable();
 
     table.boolean("is_revoked")
         .notNullable()
@@ -33,17 +34,19 @@ export async function up(knex) {
         .inTable("users")
         .onDelete("CASCADE");
     
-    table.timestamp("revoked_at").nullable();
+    table.timestamp("revoked_at", { useTz: true })
+        .nullable();
 
     table.string("revoked_reason", 500).nullable();
     table.string("cert_file", 500).nullable();
     table.string("temp_version", 100).nullable();
 
-    table.timestamp("created_at")
+    table.timestamp("created_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
   });
 };
+
 export async function down(knex) {
   await knex.schema.dropTableIfExists("certificates");
 };

@@ -14,8 +14,8 @@ const router = express.Router();
 
 router.post("/", verifyToken, createExamAttAnswer);
 router.get("/get-exam-att-ans", verifyToken, getAllExamAttAnswer);
+router.get("/attempt/:attemptId", verifyToken, getExamAttAnsByAtt);
 router.get("/:id", verifyToken, getExamAttAnsById);
-router.get("/:attemptId", verifyToken, getExamAttAnsByAtt);
 router.put("/:id", verifyToken, updateExamAttAnswer);
 
 export default router;

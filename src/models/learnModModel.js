@@ -106,32 +106,23 @@ export async function updateLearnModById(
     UPDATE learning_module
     SET
         title = COALESCE($1, title),
-        description = CASE
-            WHEN $2::boolean THEN $3
-            ELSE description
-        END,
-        display_order = COALESCE($4, display_order),
-        department_id = COALESCE($5, department_id),
-        expected_duration_minutes = 
-            COALESCE($6, expected_duration_minutes),
-        time_limit_minutes = CASE
-            WHEN $7::boolean THEN $8
-            ELSE time_limit_minutes
-        END,
-        updated_by = $9,
+        description = $2,
+        display_order = $3,
+        department_id = $4,
+        expected_duration_minutes = $5,
+        time_limit_minutes = $6,
+        updated_by = $7,
         updated_at = NOW()
-    WHERE learn_mod_id = $10
+    WHERE learn_mod_id = $8
     RETURNING *;
     `;
     const values = [
-        title ?? null,
-        description !== undefined,
-        description  ?? null,
-        displayOrder ?? null,
-        departmentId ?? null, 
-        expectedDurationMinutes ?? null,
-        timeLimitMinutes !== undefined,
-        timeLimitMinutes ?? null,
+        title,
+        description,
+        displayOrder,
+        departmentId, 
+        expectedDurationMinutes,
+        timeLimitMinutes,
         updatedBy,
         learnModId
     ];

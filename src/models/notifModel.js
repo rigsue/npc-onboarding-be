@@ -102,3 +102,15 @@ export async function markNotifAsRead(
     );
     return rows[0];
 }
+
+export async function notifUnreadCount(userId) {
+    const sql = `
+        SELECT COUNT(*) AS unread_count
+        FROM notification_recipients
+        WHERE user_id = $1
+            AND is_read = false;
+    `;
+    const { rows } = await pool.query(sql, [userId]);
+
+    return Number(rows[0].unread_count);
+}

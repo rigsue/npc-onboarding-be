@@ -23,16 +23,17 @@ export async function up(knex) {
     table.text("answer_text").nullable();
     table.boolean("is_correct").nullable();
     table.decimal("points_awarded", 5, 2)
-    .nullable()
-    .checkBetween([0, 999.99]);
+      .nullable()
+      .checkBetween([0, 999.99]);
 
-    table.timestamp("answered_at")
+    table.timestamp("answered_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
 
     table.unique([ "exam_attempt_id", "question_id"]);
   });
 };
+
 export async function down(knex) {
   await knex.schema.dropTableIfExists("exam_attempt_answers");
 };

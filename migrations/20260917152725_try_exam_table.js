@@ -23,25 +23,33 @@ export async function up(knex) {
     table.integer("total_points").notNullable();
 
     table.decimal("percentage", 5, 2)
-    .nullable()
-    .checkBetween([0, 100]);
+        .nullable()
+        .checkBetween([0, 100]);
 
-    table.boolean("is_passed").nullable().defaultTo(false);
-    table.timestamp("deadline_at").notNullable();
+    table.boolean("is_passed")
+        .nullable()
+        .defaultTo(false);
+
+    table.timestamp("deadline_at", { useTz: true })
+        .notNullable();
 
     table.string("status", 30)
         .notNullable()
         .defaultTo("in_progress");
 
-    table.timestamp("started_at")
+    table.timestamp("started_at", { useTz: true })
         .notNullable()
         .defaultTo(knex.fn.now());
 
-    table.timestamp("completed_at").nullable();
+    table.timestamp("completed_at", { useTz: true })
+        .nullable();
 
-    table.unique(["exam_id", "user_progress_id", "attempt_number"]);
+    table.unique([
+        "exam_id", "user_progress_id", "attempt_number"
+    ]);
   });
 };
+
 export async function down(knex) {
   await knex.schema.dropTableIfExists("exam_attempts");
 };

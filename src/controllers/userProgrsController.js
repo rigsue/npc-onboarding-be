@@ -48,7 +48,9 @@ export async function getUserProgressById(req, res, next) {
     try {
         const { id } = req.params;
 
-        const progress = await findUserProgressById(id);
+        const progress = await findUserProgressById({
+            userProgressId: id
+        });
 
         if (!progress) {
             const error = new Error("User progress not found");
@@ -75,6 +77,21 @@ export async function getUserProgressByUser(req, res, next) {
 
         return res.status(200).json({
             message: "User progress retrieved successfully",
+            data: progress
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
+export async function getMyUserProgress(req, res, next) {
+    try {
+        const userId = req.user.userId;
+
+        const progress = await findUserProgressByUser(userId);
+
+        return res.status(200).json({
+            message: "My learning progress retrieved successfully",
             data: progress
         });
     } catch (err) {

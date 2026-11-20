@@ -14,6 +14,7 @@ export async function createQuestion(question, connection = pool) {
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING
+            question_id,
             exam_id,
             question,
             question_type,

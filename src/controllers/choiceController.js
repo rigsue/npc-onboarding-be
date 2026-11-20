@@ -100,34 +100,30 @@ export async function updateChoice(req, res, next) {
             displayOrder
         } = req.body;
 
-        if (!isCorrect) {
-            const error = new Error(
-                "Choice text is required"
-            );
-            error.status = 400;
-            error.code = "missing_choice_text";
-            throw error;
-        }
-        const choice = await updateChoiceById(
-            id,
-            choiceText,
-            isCorrect,
-            displayOrder,
-            req.user.userId
-        );
-
         if (
             typeof choiceText !== "string" ||
             !choiceText.trim() ||
-            typeof isCorrect !== "boolean"
-            ) {
-        const error = new Error(
-            "Choice text and a valid isCorrect boolean are required"
-                );
-            error.status = 400;
-            error.code = "invalid_choice_fields";
-            throw error;
-                }
+            typeof isCorrect !== "boolean" ||
+            !Number.isSafeInteger(Number(displayOrder)) ||
+            Number(displayOrder) < 1
+        ) {
+            return res.status(400).json({
+                message: "Invalid choice fields"
+            });
+        }
+        const choice = await updateChoiceById(
+            id,
+            choiceText.trim(),
+            isCorrect,
+            Number(displayOrder),
+            req.user.userId
+        );
+
+        if (!choice) {
+            return res.status(404).json({
+                message: "Choice not found"
+            });
+        }
 
         return res.status(200).json({
             message: "Choice updated successfully",
@@ -140,21 +136,30 @@ export async function updateChoice(req, res, next) {
 
 export async function updateChoiceStatus(req, res, next) {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const { isActive } = req.body;
         const updatedBy = req.user.userId;
+
+        if (typeof isActive !== "boolean") {
+            const error = new Error("is_active must be a boolean");
+            error.status = 400;
+            error.code = "invalid_status";
+            throw error;
+        }
 
         const choice = await updateChoiceStat(
             id,
             isActive,
             updatedBy
         );
-         if (!choice) {
-            return res.status(400).json({
-                message: "choice_not_found"
-            })
-         }
-        
+
+        if (!choice) {
+            const error = new Error("Choice not found");
+            error.status = 404;
+            error.code = "choice_not_found";
+            throw error;
+        }
+
         return res.status(200).json({
             message: "Choice status updated successfully",
             data: choice
