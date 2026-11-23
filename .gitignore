@@ -1,6 +1,7 @@
 node_modules
 .env
 old/
+trace-punycode.cjs.disabled
 
 .vscode/*
 !.vscode/extensions.json

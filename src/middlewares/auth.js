@@ -1,9 +1,6 @@
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 
 import { findActiveUserSession } from "../models/userSessionModel.js";
-
-dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET_KEY
 
