@@ -102,6 +102,7 @@ export async function createUserControl(req, res, next) {
         let emailSent = false;
 
         try {
+            const lmsPlatform =  process.env.LMS_PLATFORM;
             
             const emailSubject = "NPC LMS - Your Account Has Been Created";
 
@@ -119,7 +120,7 @@ export async function createUserControl(req, res, next) {
 
                 You can access the LMS using the following link:
 
-                https://your-lms-domain.com
+                ${lmsPlatform}
 
                 Please change your temporary password upon your first login.
 

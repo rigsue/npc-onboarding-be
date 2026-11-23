@@ -1,6 +1,6 @@
 import { ClientSecretCredential } from "@azure/identity";
 import { Client } from "@microsoft/microsoft-graph-client";
-import "isomorphic-fetch";
+// import "isomorphic-fetch";
 
 const credential = new ClientSecretCredential(
     process.env.MS_TENANT_ID,
